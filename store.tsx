@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, Rea
 
 // --- DATABASE CONFIGURATION ---
 const DB_NAME = 'LifeSyncDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incremented version to trigger upgrade for existing users
 const STORE_KEYS = [
     'tasks', 'habits', 'shoppingListItems', 'itemCategoryMap', 'workoutPlans',
     'workoutHistory', 'journalEntries', 'journalPromptHistory', 'journalDrafts',
@@ -38,7 +38,6 @@ const initDB = (): Promise<IDBDatabase> => {
     return dbPromise;
 };
 
-// FIX: Added a trailing comma to the generic type parameter to disambiguate from JSX syntax.
 const dbGet = async <T,>(storeName: string, key: string): Promise<T | undefined> => {
     const db = await initDB();
     return new Promise((resolve, reject) => {
@@ -135,17 +134,24 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     useEffect(() => {
         const loadData = async () => {
-            await initDB();
-            await migrateFromLocalStorage();
-            const allData = await dbGetAllData();
-            setDataState(allData);
-            setIsLoaded(true);
+            try {
+                await initDB();
+                await migrateFromLocalStorage();
+                const allData = await dbGetAllData();
+                setDataState(allData);
+            } catch (error) {
+                console.error("Critical Error: Failed to initialize or load data from IndexedDB.", error);
+                // Fallback to an empty state to prevent a crash
+                setDataState({});
+            } finally {
+                // Ensure the app always proceeds from the loading screen
+                setIsLoaded(true);
+            }
         };
         loadData();
     }, []);
 
     const setData = useCallback((key: string, value: any) => {
-        // Fix: Correctly handle functional updates to prevent stale state.
         setDataState(prevData => {
             const currentSlice = prevData[key];
             const newSliceValue = typeof value === 'function' ? value(currentSlice) : value;

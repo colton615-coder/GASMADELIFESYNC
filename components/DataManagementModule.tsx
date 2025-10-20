@@ -7,7 +7,8 @@ const DATA_KEYS = [
     'tasks', 'habits', 'shoppingListItems', 'itemCategoryMap', 'workoutPlans',
     'workoutHistory', 'journalEntries', 'journalPromptHistory', 'journalDrafts',
     'moodLogs', 'journalAnalysisCache', 'dailyAffirmations', 'swingHistory',
-    'biometricSettings', 'dismissedInsights', 'dailyAffirmationLog', 'lastSyncTime'
+    'biometricSettings', 'dismissedInsights', 'dailyAffirmationLog', 'lastSyncTime',
+    'adaptiveThemeSettings', 'journalSummaryCache', 'mindfulMomentsChat'
 ];
 
 const DataManagementModule: React.FC<{ className?: string }> = ({ className = '' }) => {

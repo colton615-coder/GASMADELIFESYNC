@@ -13,19 +13,31 @@ let geminiApiKey; // Will be set by the client
 
 // --- INDEXEDDB HELPERS (Must be self-contained for SW) ---
 const DB_NAME = 'LifeSyncDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incremented DB version
 const STORE_KEYS = [
     'tasks', 'habits', 'shoppingListItems', 'itemCategoryMap', 'workoutPlans',
     'workoutHistory', 'journalEntries', 'journalPromptHistory', 'journalDrafts',
     'moodLogs', 'journalAnalysisCache', 'dailyAffirmations', 'swingHistory',
-    'biometricSettings', 'dismissedInsights', 'dailyAffirmationLog', 'lastSyncTime'
+    'biometricSettings', 'dismissedInsights', 'dailyAffirmationLog', 'lastSyncTime',
+    'adaptiveThemeSettings', 'journalSummaryCache', 'mindfulMomentsChat'
 ];
 
 const initDB = () => new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
     request.onerror = () => reject(new Error('Failed to open DB'));
     request.onsuccess = () => resolve(request.result);
-    // Note: onupgradeneeded is handled by the main app thread.
+    // Added robust onupgradeneeded handler for the service worker
+    request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        STORE_KEYS.forEach(key => {
+            if (!db.objectStoreNames.contains(key)) {
+                db.createObjectStore(key, { keyPath: 'key' });
+            }
+        });
+        if (!db.objectStoreNames.contains('app_meta')) {
+            db.createObjectStore('app_meta', { keyPath: 'key' });
+        }
+    };
 });
 
 const dbGetAll = async (storeName) => {
