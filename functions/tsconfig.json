@@ -1,16 +1,3 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "outDir": "lib",
-    "sourceMap": true,
-    "strict": true,
-    "target": "es2017",
-    "esModuleInterop": true
-  },
-  "compileOnSave": true,
-  "include": [
-    "src"
-  ]
+  "//": "This file was for the Firebase Function typescript configuration and is no longer needed. It can be safely deleted."
 }

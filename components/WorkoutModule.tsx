@@ -898,7 +898,6 @@ const WorkoutSessionFocusView: React.FC<{
   
   const currentSets = sessionProgress[currentExercise.id] || [];
   const currentSetIndex = currentSets.findIndex(set => !set.completed);
-  // FIX: Removed duplicated declaration of `isLastSetOfExercise`. This was a syntax error causing the compiler to report a misleading follow-on error.
   const isLastSetOfExercise = currentSetIndex === Number(currentExercise.sets) - 1;
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;
 
