@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Life Sync</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#181818" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "date-fns": "https://aistudiocdn.com/date-fns@^3.6.0",
+    "date-fns/": "https://aistudiocdn.com/date-fns@^3.6.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0",
+    "firebase-functions": "https://aistudiocdn.com/firebase-functions@^6.5.0",
+    "express": "https://aistudiocdn.com/express@^5.1.0"
+  }
+}
+</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        /* Adaptive Color Palette */
+        --color-background-main: #181818;
+        --color-surface-module: #252525;
+        --color-surface-bottom-sheet: #1f1f1f;
+        --color-surface-interactive: rgba(255, 255, 255, 0.05);
+        --color-surface-interactive-hover: rgba(255, 255, 255, 0.1);
+        --color-border: rgba(255, 255, 255, 0.1);
+        --color-border-hover: rgba(255, 255, 255, 0.2);
+        
+        --color-text-primary: rgba(255, 255, 255, 0.87);
+        --color-text-title: #f9fafb;
+        --color-text-header: #f3f4f6;
+        --color-text-caption: #9ca3af;
+        
+        --color-accent-indigo: #818cf8;
+        --color-accent-indigo-light: #a5b4fc;
+        --color-accent-indigo-text: #c7d2fe;
+        --color-accent-indigo-bg: rgba(129, 140, 248, 0.1);
+        --color-accent-indigo-bg-hover: rgba(129, 140, 248, 0.2);
+        --color-accent-indigo-solid: #6366f1;
+        --color-accent-indigo-solid-hover: #4f46e5;
+        
+        --color-accent-green: #22c55e;
+        --color-accent-green-bg: rgba(34, 197, 94, 0.1);
+        --color-accent-green-flash-start: rgba(34, 197, 94, 0.3);
+      }
+
+      body {
+        background-color: var(--color-background-main);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-size: 1rem;
+        font-weight: 400;
+        color: var(--color-text-primary);
+        line-height: 1.6;
+        transition: background-color 0.5s ease, color 0.5s ease;
+      }
+
+      /* Professional Typography System */
+      .text-title {
+        font-size: 2rem; /* 32px */
+        font-weight: 700;
+        color: var(--color-text-title);
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+      }
+
+      .text-module-header {
+        font-size: 1.25rem; /* 20px */
+        font-weight: 600;
+        color: var(--color-text-header);
+        letter-spacing: -0.01em;
+        line-height: 1.4;
+      }
+
+      .text-body-emphasis {
+        font-size: 1rem; /* 16px */
+        font-weight: 600;
+        color: var(--color-text-header);
+        line-height: 1.5;
+      }
+
+      .text-body {
+        font-size: 1rem; /* 16px */
+        font-weight: 400;
+        color: var(--color-text-primary);
+        line-height: 1.6;
+      }
+
+      .text-caption {
+        font-size: 0.875rem; /* 14px */
+        font-weight: 400;
+        color: var(--color-text-caption);
+        line-height: 1.5;
+      }
+
+      /* Global transition for interactive elements */
+      button, a {
+        transition: all 150ms ease-in-out;
+      }
+      
+      /* Accessibility utility class */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+
+      /* Custom scrollbar for webkit browsers */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--color-surface-interactive-hover);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--color-accent-indigo-bg-hover);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-accent-indigo-bg);
+      }
+      
+      /* Custom animations for modal and events */
+      @keyframes flash-bg {
+        0% { background-color: var(--color-accent-indigo-bg-hover); }
+        100% { background-color: var(--color-surface-interactive); }
+      }
+      .flash-animation {
+        animation: flash-bg 1s ease-out forwards;
+      }
+
+      @keyframes flash-green-bg {
+        0% { background-color: var(--color-accent-green-flash-start); }
+        100% { background-color: var(--color-accent-green-bg); }
+      }
+      .flash-green-animation {
+        animation: flash-green-bg 0.5s ease-out;
+      }
+      
+      @keyframes item-enter {
+        from {
+          opacity: 0;
+          transform: translateY(-10px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      .item-enter-animation {
+        animation: item-enter 0.3s ease-out forwards;
+      }
+      
+      /* Affirmation Carousel Animations */
+      @keyframes slide-in-from-right {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      @keyframes slide-out-to-left {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(-30px); }
+      }
+      @keyframes slide-in-from-left {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      @keyframes slide-out-to-right {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(30px); }
+      }
+
+      .affirmation-slide-in-right {
+        animation: slide-in-from-right 0.4s ease-out forwards;
+      }
+      .affirmation-slide-out-left {
+        animation: slide-out-to-left 0.4s ease-out forwards;
+      }
+      .affirmation-slide-in-left {
+        animation: slide-in-from-left 0.4s ease-out forwards;
+      }
+      .affirmation-slide-out-right {
+        animation: slide-out-to-right 0.4s ease-out forwards;
+      }
+
+      /* Completion Animation */
+      .particle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--color);
+        /* Start centered */
+        transform: translate(-50%, -50%);
+        animation: particle-animate 0.5s ease-out forwards;
+        pointer-events: none;
+      }
+
+      @keyframes particle-animate {
+        0% {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+        100% {
+          /* Move outwards based on angle, fade out, and shrink */
+          transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-35px) scale(0);
+          opacity: 0;
+        }
+      }
+
+      @keyframes checkmark-in {
+        0% {
+          transform: scale(0.6);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .checkmark-animation {
+        animation: checkmark-in 250ms cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
+
+      /* Bottom Sheet Animations */
+      @keyframes slide-up-in {
+        from {
+          transform: translateY(100%);
+        }
+        to {
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slide-down-out {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(100%);
+        }
+      }
+
+      .bottom-sheet-anim-in {
+        animation: slide-up-in 0.3s ease-out forwards;
+      }
+      .bottom-sheet-anim-out {
+        animation: slide-down-out 0.3s ease-out forwards;
+      }
+
+      /* Nav Icon Tap Animation */
+      @keyframes nav-icon-pop {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(0.9); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      .nav-icon-pop-animation {
+        animation: nav-icon-pop 150ms ease-in-out;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.js"></script>
+  </body>
+</html>
