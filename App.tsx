@@ -18,6 +18,7 @@ import { DataProvider, useStore } from './store';
 import { LoaderIcon } from './components/icons';
 import useAdaptiveTheme from './hooks/useAdaptiveTheme';
 import MindfulMomentsModule from './components/MindfulMomentsModule';
+import WeeklyReviewModule from './components/WeeklyReviewModule';
 
 interface BiometricSettings {
     isEnabled: boolean;
@@ -132,6 +133,8 @@ const AppContent: React.FC = () => {
         return <SettingsModule />;
       case 'MINDFUL_MOMENTS':
         return <MindfulMomentsModule setIsFocusMode={setIsFocusMode} setActiveModule={setActiveModule} />;
+      case 'WEEKLY_REVIEW':
+        return <WeeklyReviewModule setIsFocusMode={setIsFocusMode} setActiveModule={setActiveModule} />;
       default:
         return <Dashboard setActiveModule={setActiveModule} setJournalLink={setJournalLink} />;
     }

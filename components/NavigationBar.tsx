@@ -9,7 +9,8 @@ import {
     GolfIcon, 
     BookOpenIcon, 
     StatsIcon,
-    SettingsIcon
+    SettingsIcon,
+    ClipboardCheckIcon
 } from './icons';
 
 interface NavButtonProps {
@@ -62,6 +63,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeModule, setActiveMo
         { id: 'SWING', label: 'Swing', icon: <GolfIcon /> },
         { id: 'JOURNAL', label: 'Journal', icon: <BookOpenIcon /> },
         { id: 'STATS', label: 'Stats', icon: <StatsIcon /> },
+        { id: 'WEEKLY_REVIEW', label: 'Review', icon: <ClipboardCheckIcon /> },
         { id: 'SETTINGS', label: 'Settings', icon: <SettingsIcon /> },
     ];
 

@@ -5,6 +5,7 @@ import TodayWidgetView from './TodayWidgetView';
 import ProactiveSuggestions from './ProactiveSuggestions';
 import JournalInsightWidget from './JournalInsightWidget';
 import MindfulMomentsWidget from './MindfulMomentsWidget';
+import WeeklyReviewWidget from './WeeklyReviewWidget';
 
 const Dashboard: React.FC<{ 
   setActiveModule: (module: string) => void;
@@ -13,6 +14,8 @@ const Dashboard: React.FC<{
   return (
     <div className="flex flex-col gap-6">
       <ProactiveSuggestions setActiveModule={setActiveModule} />
+
+      <WeeklyReviewWidget setActiveModule={setActiveModule} />
       
       <TodayWidgetView setActiveModule={setActiveModule} />
 
@@ -21,10 +24,12 @@ const Dashboard: React.FC<{
            <JournalInsightWidget setActiveModule={setActiveModule} setJournalLink={setJournalLink} /> 
         </div>
         <MindfulMomentsWidget setActiveModule={setActiveModule} />
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
             <DashboardStatsWidget setActiveModule={setActiveModule} />
         </div>
-        <DataManagementModule />
+        <div className="lg:col-span-3">
+            <DataManagementModule />
+        </div>
       </div>
     </div>
   );

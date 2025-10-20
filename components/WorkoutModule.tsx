@@ -456,7 +456,7 @@ const WorkoutPlanList: React.FC<{
                                 <div className="w-full flex items-center justify-between text-sm">
                                     <span className="text-red-400 font-semibold">Delete this plan?</span>
                                     <div className="flex items-center gap-2">
-                                        <button onClick={onConfirmDelete} className="p-2 rounded-full text-white bg-red-600 hover:bg-red-700" aria-label="Confirm delete plan"><CheckIcon className="w-4 h-4" /></button>
+                                        <button onClick={onConfirmDelete} className="p-2 rounded-full text-white bg-red-600 hover:bg-red-700" aria-label={`Confirm delete ${plan.name} plan`}><CheckIcon className="w-4 h-4" /></button>
                                         <button onClick={onCancelDelete} className="p-2 rounded-full text-gray-300 bg-white/10 hover:bg-white/20" aria-label="Cancel delete plan"><XIcon className="w-4 h-4" /></button>
                                     </div>
                                 </div>
@@ -885,7 +885,6 @@ const WorkoutSessionFocusView: React.FC<{
 
   const currentExercise = plan.exercises[currentExerciseIndex];
 
-  // FIX: Add early return to prevent accessing properties of undefined if plan is empty or index is out of bounds.
   useEffect(() => {
     if (!currentExercise) {
         onCancel();
@@ -898,8 +897,9 @@ const WorkoutSessionFocusView: React.FC<{
   
   const currentSets = sessionProgress[currentExercise.id] || [];
   const currentSetIndex = currentSets.findIndex(set => !set.completed);
-  // FIX: Removed redundant Number() conversion for a property that is already a number type.
-  const isLastSetOfExercise = currentSetIndex === currentExercise.sets - 1;
+  // FIX: Coerce `currentExercise.sets` to a number to prevent type errors during arithmetic operations,
+  // as data from persistent storage might be stringified.
+  const isLastSetOfExercise = currentSetIndex === Number(currentExercise.sets) - 1;
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;
 
   const playSound = useCallback((type: 'work' | 'rest') => {
