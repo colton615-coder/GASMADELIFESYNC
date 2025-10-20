@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react';
 import usePersistentState from '../hooks/usePersistentState';
 import { format } from 'date-fns';
 import { HeartIcon } from './icons';
-
-interface Affirmation {
-  id: string;
-  text: string;
-}
+import { Affirmation } from './AffirmationFormModal';
 
 interface DailyAffirmationLog {
   date: string;

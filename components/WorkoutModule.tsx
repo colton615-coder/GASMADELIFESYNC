@@ -898,7 +898,8 @@ const WorkoutSessionFocusView: React.FC<{
   
   const currentSets = sessionProgress[currentExercise.id] || [];
   const currentSetIndex = currentSets.findIndex(set => !set.completed);
-  const isLastSetOfExercise = currentSetIndex === Number(currentExercise.sets) - 1;
+  // FIX: Removed redundant Number() conversion for a property that is already a number type.
+  const isLastSetOfExercise = currentSetIndex === currentExercise.sets - 1;
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;
 
   const playSound = useCallback((type: 'work' | 'rest') => {
