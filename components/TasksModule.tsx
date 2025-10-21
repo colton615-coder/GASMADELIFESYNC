@@ -378,7 +378,7 @@ const TasksModule: React.FC<{ className?: string }> = ({ className = '' }) => {
               ))
             ) : (
               <div className="text-center py-8 text-caption">
-                <p>All tasks completed. Great job!</p>
+                <p>Ready to take on the day? Add your first task above.</p>
               </div>
             )}
           </ul>
