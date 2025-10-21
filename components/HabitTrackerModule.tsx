@@ -84,30 +84,6 @@ const HabitCard: React.FC<{
     return currentStreak;
   }, [habit.history, habit.target, habit.schedule]);
 
-  const weeklyProgress = useMemo(() => {
-    const start = startOfWeek(today);
-    const end = endOfWeek(today);
-    const weekDates = eachDayOfInterval({ start, end });
-    const effectiveTarget = habit.target ?? 1;
-    
-    const scheduledDaysInWeek = weekDates.filter(date => isScheduledForDay(habit, date)).length;
-    
-    if (scheduledDaysInWeek === 0) return 100;
-
-    const completedDays = weekDates.reduce((count, date) => {
-        if (isScheduledForDay(habit, date)) {
-            const dateKey = format(date, 'yyyy-MM-dd');
-            const progress = habit.history[dateKey];
-            if (progress !== undefined && (progress >= effectiveTarget || progress === -1)) {
-                return count + 1;
-            }
-        }
-        return count;
-    }, 0);
-    
-    return (completedDays / scheduledDaysInWeek) * 100;
-  }, [habit.history, habit.target, habit.schedule, today]);
-
   const quantityProgress = isSkippedToday ? 100 : (target > 1 ? (dailyProgress / target) * 100 : (isCompletedToday ? 100 : 0));
 
   return (
@@ -130,7 +106,7 @@ const HabitCard: React.FC<{
             </div>
 
             {isSimpleHabit ? (
-                <div className="flex items-center gap-2 self-end">
+                <div className="flex items-center gap-2 self-start">
                     <span className="text-sm font-semibold text-gray-300">
                       {isSkippedToday ? 'Skipped' : isCompletedToday ? 'Done!' : 'Done Today'}
                     </span>
@@ -166,20 +142,22 @@ const HabitCard: React.FC<{
             )}
         </div>
         
-        <div>
-            <div className="flex justify-between items-center mb-1">
-                <span className="text-xs font-semibold text-gray-400">{isSimpleHabit ? 'Weekly Consistency' : `Today's Goal: ${target} ${unit}`}</span>
-                <span className="text-xs font-semibold text-gray-300">{Math.round(isSimpleHabit ? weeklyProgress : quantityProgress)}%</span>
-            </div>
-            <div className="w-full bg-black/30 rounded-full h-2 overflow-hidden">
-                <div 
-                    className={`h-2 rounded-full transition-all duration-500 ease-out 
-                      ${isCompletedToday ? 'bg-gradient-to-r from-green-400 to-teal-400' : 
-                       isSkippedToday ? 'bg-gray-500' : 'bg-gradient-to-r from-indigo-500 to-purple-500'}`}
-                    style={{ width: `${isSimpleHabit ? weeklyProgress : quantityProgress}%` }}
-                />
-            </div>
-        </div>
+        {!isSimpleHabit && (
+          <div>
+              <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs font-semibold text-gray-400">{`Today's Goal: ${target} ${unit}`}</span>
+                  <span className="text-xs font-semibold text-gray-300">{Math.round(quantityProgress)}%</span>
+              </div>
+              <div className="w-full bg-black/30 rounded-full h-2 overflow-hidden">
+                  <div 
+                      className={`h-2 rounded-full transition-all duration-500 ease-out 
+                        ${isCompletedToday ? 'bg-gradient-to-r from-green-400 to-teal-400' : 
+                         isSkippedToday ? 'bg-gray-500' : 'bg-gradient-to-r from-indigo-500 to-purple-500'}`}
+                      style={{ width: `${quantityProgress}%` }}
+                  />
+              </div>
+          </div>
+        )}
         
         <div className="absolute top-2 right-2 flex items-center">
           {!isCompletedToday && (
