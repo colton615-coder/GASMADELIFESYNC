@@ -1,44 +1,14 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-    <script
-      src="https://browser.sentry-cdn.com/7.118.0/bundle.min.js"
-      integrity="sha384-2q7fGGSRSA0z2Z6s9iubZ2/1U8hCg2I0CDQLo2yLhM9e2d6pX2+c2B2yZl2/C8h/"
-      crossorigin="anonymous"
-    ></script>
-    <script>
-      Sentry.init({
-        dsn: "https://da41553c3ed740d6c0609ee4c143e8a3@o4510225038639104.ingest.us.sentry.io/4510225040605184",
-        integrations: [
-          new Sentry.BrowserTracing(),
-          new Sentry.Replay(),
-        ],
-        // Performance Monitoring
-        tracesSampleRate: 1.0,
-        // Session Replay
-        replaysSessionSampleRate: 0.1,
-        replaysOnErrorSampleRate: 1.0,
-      });
-    </script>
-    <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "date-fns": "https://aistudiocdn.com/date-fns@^3.6.0",
-    "date-fns/": "https://aistudiocdn.com/date-fns@^3.6.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0",
-    "firebase-functions": "https://aistudiocdn.com/firebase-functions@^6.5.0",
-    "express": "https://aistudiocdn.com/express@^5.1.0"
-  }
-}
-</script>
+    <title>Life Sync</title>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#181818" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       :root {
@@ -299,9 +269,23 @@
       }
 
     </style>
-  </head>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.25.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.0.4",
+    "vite": "https://aistudiocdn.com/vite@^7.1.11",
+    "date-fns": "https://aistudiocdn.com/date-fns@^4.1.0"
+  }
+}
+</script>
+</head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/index.js"></script>
+    <script type="module" src="/index.tsx"></script>
   </body>
 </html>
