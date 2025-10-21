@@ -897,9 +897,8 @@ const WorkoutSessionFocusView: React.FC<{
   
   const currentSets = sessionProgress[currentExercise.id] || [];
   const currentSetIndex = currentSets.findIndex(set => !set.completed);
-  // Fix for ts(2362): The `sets` property, when loaded from persistent storage, might be a string.
-  // By explicitly casting to a number in a separate step, we resolve the TypeScript error
-  // and ensure the arithmetic operation is valid.
+  // Fix: The `sets` property, when loaded from persistent storage, might be a string.
+  // By explicitly casting to a number, we ensure the arithmetic operation is valid.
   const totalSetsAsNumber = Number(currentExercise.sets);
   const isLastSetOfExercise = currentSetIndex === totalSetsAsNumber - 1;
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;

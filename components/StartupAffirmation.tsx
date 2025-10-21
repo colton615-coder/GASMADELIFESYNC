@@ -3,23 +3,17 @@ import usePersistentState from '../hooks/usePersistentState';
 import { format } from 'date-fns';
 import { HeartIcon } from './icons';
 import { Affirmation } from './AffirmationFormModal';
+import { affirmations as defaultAffirmations } from '../services/affirmations';
 
 interface DailyAffirmationLog {
   date: string;
   text: string;
 }
 
-const DEFAULT_AFFIRMATIONS: Affirmation[] = [
-  { id: '1', text: 'I am capable of achieving great things.' },
-  { id: '2', text: 'I choose to be happy and to love myself today.' },
-  { id: '3', text: 'My potential to succeed is infinite.' },
-  { id: '4', text: 'I am creating the life of my dreams.' },
-];
-
 type ComponentMode = 'splash' | 'banner' | 'hidden';
 
 const StartupAffirmation: React.FC<{ onAnimationComplete: () => void; activeModule: string; }> = ({ onAnimationComplete, activeModule }) => {
-  const [affirmations] = usePersistentState<Affirmation[]>('dailyAffirmations', DEFAULT_AFFIRMATIONS);
+  const [affirmations] = usePersistentState<Affirmation[]>('dailyAffirmations', defaultAffirmations);
   const [dailyLog, setDailyLog] = usePersistentState<DailyAffirmationLog>('dailyAffirmationLog', { date: '', text: '' });
   
   const [affirmationText, setAffirmationText] = useState('');
@@ -33,7 +27,7 @@ const StartupAffirmation: React.FC<{ onAnimationComplete: () => void; activeModu
     if (dailyLog.date === todayKey && dailyLog.text) {
       currentAffirmation = dailyLog.text;
     } else {
-      const availableAffirmations = affirmations.length > 0 ? affirmations : DEFAULT_AFFIRMATIONS;
+      const availableAffirmations = affirmations.length > 0 ? affirmations : defaultAffirmations;
       const randomIndex = Math.floor(Math.random() * availableAffirmations.length);
       currentAffirmation = availableAffirmations[randomIndex].text;
       setDailyLog({ date: todayKey, text: currentAffirmation });

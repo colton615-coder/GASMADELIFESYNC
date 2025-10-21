@@ -7,6 +7,7 @@ import { GoogleGenAI, Type } from '@google/genai';
 import BottomSheet from './BottomSheet';
 import AffirmationFormModal, { Affirmation } from './AffirmationFormModal';
 import { prompts as localPrompts } from '../services/prompts';
+import { affirmations as defaultAffirmations } from '../services/affirmations';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
@@ -33,13 +34,6 @@ const MOOD_OPTIONS = [
   { name: 'meh', emoji: '😐' },
   { name: 'bad', emoji: '😕' },
   { name: 'awful', emoji: '😭' },
-];
-
-const DEFAULT_AFFIRMATIONS: Affirmation[] = [
-  { id: '1', text: 'I am capable of achieving great things.' },
-  { id: '2', text: 'I choose to be happy and to love myself today.' },
-  { id: '3', text: 'My potential to succeed is infinite.' },
-  { id: '4', text: 'I am creating the life of my dreams.' },
 ];
 
 // --- RICH TEXT EDITOR COMPONENT ---
@@ -243,7 +237,7 @@ const JournalModule: React.FC<{
   const [analysisCache, setAnalysisCache] = usePersistentState<Record<string, JournalAnalysis>>('journalAnalysisCache', {});
   const [lastPromptIndex, setLastPromptIndex] = usePersistentState<number>('journalLastPromptIndex', -1);
   
-  const [affirmations, setAffirmations] = usePersistentState<Affirmation[]>('dailyAffirmations', DEFAULT_AFFIRMATIONS);
+  const [affirmations, setAffirmations] = usePersistentState<Affirmation[]>('dailyAffirmations', defaultAffirmations);
   const [isAffirmationModalOpen, setIsAffirmationModalOpen] = useState(false);
   const [editingAffirmation, setEditingAffirmation] = useState<Affirmation | null>(null);
   const [suggestedAffirmations, setSuggestedAffirmations] = useState<string[]>([]);
