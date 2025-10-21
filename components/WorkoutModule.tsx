@@ -918,7 +918,8 @@ const WorkoutSessionFocusView: React.FC<{
   useEffect(() => {
     const initialProgress: Record<string, CompletedSet[]> = {};
     plan.exercises.forEach(ex => {
-      initialProgress[ex.id] = Array.from({ length: ex.sets }).map(() => ({ reps: ex.reps, weight: ex.weight, completed: false }));
+// Fix: Ensure `ex.sets` is treated as a number, as it might be a string when loaded from persistent storage.
+      initialProgress[ex.id] = Array.from({ length: Number(ex.sets) }).map(() => ({ reps: ex.reps, weight: ex.weight, completed: false }));
     });
     setSessionProgress(initialProgress);
   }, [plan]);
