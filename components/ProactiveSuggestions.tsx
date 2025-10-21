@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import Module from './Module';
 import { SparklesIcon, LoaderIcon, XIcon, ChevronRightIcon } from './icons';
 import usePersistentState from '../hooks/usePersistentState';
@@ -28,23 +28,32 @@ const LATE_HOUR_THRESHOLD = 22; // 10 PM
 const MOOD_RISK_SCORE = { 'rad': -1, 'good': 0, 'meh': 1, 'bad': 2, 'awful': 3 };
 const WORKOUT_HABIT_KEYWORDS = ['workout', 'gym', 'run', 'exercise', 'fitness'];
 
+const MOOD_OPTIONS = [
+  { name: 'rad', emoji: '🤩' },
+  { name: 'good', emoji: '😊' },
+  { name: 'meh', emoji: '😐' },
+  { name: 'bad', emoji: '😕' },
+  { name: 'awful', emoji: '😭' },
+];
+
 const ProactiveSuggestions: React.FC<{ setActiveModule: (module: string) => void }> = ({ setActiveModule }) => {
   const [tasks] = usePersistentState<Task[]>('tasks', []);
   const [moods] = usePersistentState<Record<string, MoodLog>>('moodLogs', {});
   const [habits] = usePersistentState<Habit[]>('habits', []);
   
-  const todayKey = format(new Date(), 'yyyy-MM-dd');
   const [dismissedInsights, setDismissedInsights] = usePersistentState<Record<string, boolean>>('dismissedInsights', {});
 
   const [isLoading, setIsLoading] = useState(true);
   const [insight, setInsight] = useState<{ text: string, suggestion: string, module: string } | null>(null);
 
+  const todayKey = format(new Date(), 'yyyy-MM-dd');
   const isDismissedToday = dismissedInsights[todayKey];
+  const todaysMood = moods[todayKey];
 
   useEffect(() => {
     const runAnalysis = () => {
       // Don't re-run if already dismissed
-      if (isDismissedToday) {
+      if (dismissedInsights[format(new Date(), 'yyyy-MM-dd')]) {
         setIsLoading(false);
         return;
       }
@@ -53,7 +62,6 @@ const ProactiveSuggestions: React.FC<{ setActiveModule: (module: string) => void
       const startDate = subDays(new Date(), ANALYSIS_PERIOD_DAYS);
       const dateRange = Array.from({ length: ANALYSIS_PERIOD_DAYS }, (_, i) => subDays(new Date(), i));
       
-      let riskScore = 0;
       let lateNights = 0;
       let lowMoodDays = 0;
       let workoutSkipCount = 0;
@@ -134,7 +142,7 @@ const ProactiveSuggestions: React.FC<{ setActiveModule: (module: string) => void
     // Run analysis after a short delay to allow the main UI to render
     const timer = setTimeout(runAnalysis, 1500);
     return () => clearTimeout(timer);
-  }, [tasks, moods, habits, todayKey, isDismissedToday]);
+  }, [tasks, moods, habits, dismissedInsights]);
 
   const handleDismiss = () => {
     setDismissedInsights({ ...dismissedInsights, [todayKey]: true });
@@ -149,36 +157,53 @@ const ProactiveSuggestions: React.FC<{ setActiveModule: (module: string) => void
     );
   }
 
-  if (!insight || isDismissedToday) {
-    return null; // Don't render if there's no insight or it's been dismissed
-  }
-
-  return (
-    <Module
-        title="AI Insight"
-        icon={<SparklesIcon />}
-        className="!border-indigo-500/50"
-    >
-        <div className="flex flex-col md:flex-row items-start gap-4">
-            <div className="flex-1">
-                <p className="text-body text-gray-200">{insight.text}</p>
+  // If we have a valid insight, show it. This takes priority.
+  if (insight && !isDismissedToday) {
+    return (
+        <Module
+            title="AI Insight"
+            icon={<SparklesIcon />}
+            className="!border-indigo-500/50"
+        >
+            <div className="flex flex-col md:flex-row items-start gap-4">
+                <div className="flex-1">
+                    <p className="text-body text-gray-200">{insight.text}</p>
+                    <button 
+                      onClick={() => setActiveModule(insight.module)}
+                      className="mt-2 flex items-center gap-2 text-sm font-semibold text-indigo-300 hover:text-indigo-200 transition-colors group"
+                    >
+                        <span>{insight.suggestion}</span>
+                        <ChevronRightIcon className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                    </button>
+                </div>
                 <button 
-                  onClick={() => setActiveModule(insight.module)}
-                  className="mt-2 flex items-center gap-2 text-sm font-semibold text-indigo-300 hover:text-indigo-200 transition-colors group"
+                    onClick={handleDismiss}
+                    className="p-2 rounded-full text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
+                    aria-label="Dismiss insight for today"
                 >
-                    <span>{insight.suggestion}</span>
-                    <ChevronRightIcon className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                    <XIcon className="w-5 h-5" />
                 </button>
             </div>
-            <button 
-                onClick={handleDismiss}
-                className="p-2 rounded-full text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
-                aria-label="Dismiss insight for today"
-            >
-                <XIcon className="w-5 h-5" />
-            </button>
+        </Module>
+    );
+  }
+
+  // Otherwise, show the mood status card as a default.
+  const moodInfo = todaysMood ? MOOD_OPTIONS.find(m => m.name === todaysMood.mood) : null;
+
+  return (
+    <div 
+        onClick={() => setActiveModule('JOURNAL')}
+        className="flex items-center justify-between gap-4 p-4 bg-white/5 rounded-2xl border border-transparent cursor-pointer hover:border-indigo-400/50 transition-colors group"
+    >
+        <div className="flex-1 min-w-0">
+            <h3 className="text-body-emphasis">
+                {moodInfo ? `Today's Mood: ${moodInfo.name.charAt(0).toUpperCase() + moodInfo.name.slice(1)} ${moodInfo.emoji}` : 'How are you feeling today?'}
+            </h3>
+            {!moodInfo && <p className="text-caption text-gray-400 mt-1">Tap here to log your mood.</p>}
         </div>
-    </Module>
+        <ChevronRightIcon className="w-5 h-5 text-gray-400 group-hover:text-indigo-300 transition-colors flex-shrink-0" />
+    </div>
   );
 };
 
