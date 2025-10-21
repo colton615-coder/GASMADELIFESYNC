@@ -15,6 +15,8 @@ const TodayWidgetView: React.FC<{ setActiveModule: (module: string) => void }> =
     .filter(task => !task.completed)
     .sort((a, b) => b.id - a.id) // Newest first, assuming higher ID is newer
     .slice(0, 3);
+  
+  const pendingTasksCount = tasks.filter(task => !task.completed).length;
 
   return (
     <div 
@@ -44,11 +46,13 @@ const TodayWidgetView: React.FC<{ setActiveModule: (module: string) => void }> =
           </ul>
         ) : (
           <div className="flex items-center justify-center h-32 text-gray-400">
-            <p className="text-body">No pending tasks. Well done!</p>
+            <p className="text-body">What's your top priority today?</p>
           </div>
         )}
       </div>
-      <p className="text-caption text-xs text-gray-400 mt-4 text-right">Click to view all tasks</p>
+      <p className="text-caption text-xs text-gray-400 mt-4 text-right">
+        {pendingTasksCount > 0 ? 'Click to view all tasks' : 'Click to add a task'}
+      </p>
     </div>
   );
 };

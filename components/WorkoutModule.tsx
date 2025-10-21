@@ -897,10 +897,8 @@ const WorkoutSessionFocusView: React.FC<{
   
   const currentSets = sessionProgress[currentExercise.id] || [];
   const currentSetIndex = currentSets.findIndex(set => !set.completed);
-  // FIX: The `sets` property might be a string when loaded from storage, causing a type error.
-  // Explicitly cast to a number to ensure the arithmetic operation is valid.
-  // FIX: Cast `currentExercise.sets` to a number to prevent a TypeError on the arithmetic operation.
-  const isLastSetOfExercise = currentSetIndex === Number(currentExercise.sets) - 1;
+  // FIX: The `sets` property can be a string when loaded from storage. Using `parseInt` ensures it's treated as a number.
+  const isLastSetOfExercise = currentSetIndex === parseInt(String(currentExercise.sets), 10) - 1;
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;
 
   const playSound = useCallback((type: 'work' | 'rest') => {
