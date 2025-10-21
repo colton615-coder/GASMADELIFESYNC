@@ -656,8 +656,8 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
                 </button>
             </div>
             <div role="tablist" aria-label="Archive views" className="flex border-b border-white/10 mb-4">
-                <button role="tab" aria-selected={archiveTab === 'entries'} onClick={() => setArchiveTab('entries')} className={`px-4 py-2 text-sm font-semibold transition-colors ${archiveTab === 'entries' ? 'bg-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'}`}>Entries</button>
-                <button role="tab" aria-selected={archiveTab === 'trends'} onClick={() => setArchiveTab('trends')} className={`px-4 py-2 text-sm font-semibold transition-colors ${archiveTab === 'trends' ? 'bg-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'}`}>Trends</button>
+                <button role="tab" aria-selected={archiveTab === 'entries'} onClick={() => setArchiveTab('entries')} className={`px-4 py-2 text-sm font-semibold transition-colors ${archiveTab === 'entries' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'}`}>Entries</button>
+                <button role="tab" aria-selected={archiveTab === 'trends'} onClick={() => setArchiveTab('trends')} className={`px-4 py-2 text-sm font-semibold transition-colors ${archiveTab === 'trends' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'}`}>Trends</button>
             </div>
 
             {archiveTab === 'entries' && (

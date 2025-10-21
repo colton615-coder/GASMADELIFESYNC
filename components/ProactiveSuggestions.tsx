@@ -3,7 +3,9 @@ import { SparklesIcon } from './icons';
 
 const ProactiveSuggestions: React.FC<{ setActiveModule: (module: string) => void }> = ({ setActiveModule }) => {
   const handleRequestAnalysis = () => {
-    console.log('User requested analysis.');
+    // This functionality will be expanded later. For now, it logs the action.
+    console.log('User requested analysis');
+    // A potential future action could be: setActiveModule('WEEKLY_REVIEW');
   };
 
   return (
