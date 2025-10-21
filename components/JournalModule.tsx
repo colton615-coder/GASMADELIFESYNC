@@ -28,6 +28,13 @@ interface JournalAnalysis {
   tags: string[];
 }
 
+interface Task {
+  id: number;
+  text: string;
+  completed: boolean;
+  completedAt?: string | null;
+}
+
 // --- CONSTANTS ---
 const MOOD_OPTIONS = [
   { name: 'rad', emoji: '🤩' },
@@ -237,6 +244,7 @@ const JournalModule: React.FC<{
   const [moods, setMoods] = usePersistentState<Record<string, MoodLog>>('moodLogs', {});
   const [analysisCache, setAnalysisCache] = usePersistentState<Record<string, JournalAnalysis>>('journalAnalysisCache', {});
   const [lastPromptIndex, setLastPromptIndex] = usePersistentState<number>('journalLastPromptIndex', -1);
+  const [tasks] = usePersistentState<Task[]>('tasks', []);
   
   const [affirmations, setAffirmations] = usePersistentState<Affirmation[]>('dailyAffirmations', defaultAffirmations);
   const [isAffirmationModalOpen, setIsAffirmationModalOpen] = useState(false);
@@ -491,6 +499,14 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
   const renderTodayView = () => {
     const currentAffirmation = affirmations.length > 0 ? affirmations[currentAffirmationIndex] : null;
     const isCompletedToday = !!entries[todayKey] && entries[todayKey].entryText.trim().length > 0;
+    
+    const completedTodayCount = useMemo(() => {
+        return tasks.filter(task =>
+            task.completed &&
+            task.completedAt &&
+            format(parseISO(task.completedAt), 'yyyy-MM-dd') === todayKey
+        ).length;
+    }, [tasks, todayKey]);
 
     return (
         <div className="space-y-6">
@@ -532,6 +548,12 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
               <div className="bg-black/30 p-4 rounded-lg flex flex-col justify-center">
                   {!isReady ? ( <div className="min-h-[12rem] flex justify-center items-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400"></div></div> ) : (
                       <div className="w-full">
+                          {completedTodayCount > 0 && (
+                            <div className="text-center mb-4 p-3 bg-green-500/10 text-green-300 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                                <CheckIcon className="w-5 h-5" />
+                                <span>You've completed {completedTodayCount} {completedTodayCount === 1 ? 'task' : 'tasks'} today. Great work!</span>
+                            </div>
+                          )}
                           <div className="relative group min-h-[6rem] flex items-center justify-center">
                               <p className="text-lg font-serif text-gray-300 text-center px-10">{todaysPrompt}</p>
                               <button
