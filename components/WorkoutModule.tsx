@@ -899,8 +899,7 @@ const WorkoutSessionFocusView: React.FC<{
   const currentSetIndex = currentSets.findIndex(set => !set.completed);
   // Fix: The `sets` property, when loaded from persistent storage, might be a string.
   // By explicitly casting to a number, we ensure the arithmetic operation is valid.
-  const totalSetsAsNumber = Number(currentExercise.sets);
-  const isLastSetOfExercise = currentSetIndex === totalSetsAsNumber - 1;
+  const isLastSetOfExercise = currentSetIndex === Number(currentExercise.sets) - 1;
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;
 
   const playSound = useCallback((type: 'work' | 'rest') => {

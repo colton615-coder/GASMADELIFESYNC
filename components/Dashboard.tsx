@@ -11,8 +11,22 @@ const Dashboard: React.FC<{
   setActiveModule: (module: string) => void;
   setJournalLink: (dateKey: string | null) => void;
 }> = ({ setActiveModule, setJournalLink }) => {
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  // In a real app, this would come from user settings or context.
+  const userName = "Alex"; 
+  const greeting = userName ? `${getGreeting()}, ${userName}.` : `${getGreeting()}.`;
+
   return (
     <div className="flex flex-col gap-6">
+      <h2 className="text-module-header">{greeting}</h2>
+      
       <ProactiveSuggestions setActiveModule={setActiveModule} />
 
       <WeeklyReviewWidget setActiveModule={setActiveModule} />
