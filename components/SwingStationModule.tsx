@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Module from './Module';
-import { GolfIcon, UploadIcon, SparklesIcon, AlertTriangleIcon, ImageIcon, ChevronLeftIcon, TagIcon } from './icons';
+import { GolfIcon, UploadIcon, SparklesIcon, AlertTriangleIcon, ImageIcon, ChevronLeftIcon, TagIcon, LoaderIcon } from './icons';
 import { GoogleGenAI, Modality, Type } from '@google/genai';
 import usePersistentState from '../hooks/usePersistentState';
 import { format } from 'date-fns';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+
+// Let TypeScript know about the MediaPipe global variable
+declare const mp: any;
 
 // --- TYPE DEFINITIONS ---
 type View = 'idle' | 'preview' | 'analyzing' | 'result' | 'error' | 'history';
@@ -35,6 +38,11 @@ interface SwingHistoryEntry {
   thumbnail: string; // base64 jpeg string of a key frame
   tags: string[];
   savedAt: string; // ISO string
+}
+
+interface KeyFrame {
+    position: string;
+    image: string; // base64 jpeg data URL
 }
 
 // Helper function to extract frames from a video file.
@@ -150,6 +158,96 @@ const extractFramesFromVideo = (
 };
 
 
+const analyzePoseAndExtractKeyFrames = async (
+    videoFile: File,
+    startTime: number,
+    endTime: number,
+    onProgress: (progress: string) => void
+): Promise<KeyFrame[]> => {
+    // 1. Initialize PoseLandmarker
+    onProgress('Initializing pose model...');
+    const { PoseLandmarker, FilesetResolver } = (window as any).mp.tasks.vision;
+    const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
+    const poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
+        baseOptions: {
+            modelAssetPath: `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task`,
+            delegate: "GPU"
+        },
+        runningMode: "VIDEO",
+        numPoses: 1,
+    });
+    
+    // 2. Process video frames
+    onProgress('Analyzing swing motion...');
+    const video = document.createElement('video');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error("Could not create canvas context.");
+
+    video.src = URL.createObjectURL(videoFile);
+    await new Promise(resolve => video.onloadedmetadata = resolve);
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    const clipDuration = endTime - startTime;
+    const FPS = 15;
+    const frameCount = Math.floor(clipDuration * FPS);
+    const frameData: { timestamp: number; landmarks: any[] }[] = [];
+
+    for (let i = 0; i < frameCount; i++) {
+        const timestamp = startTime + (i / FPS);
+        video.currentTime = timestamp;
+        await new Promise<void>(res => video.onseeked = () => res());
+        const result = poseLandmarker.detectForVideo(video, Math.round(timestamp * 1000));
+        if (result.landmarks && result.landmarks.length > 0) {
+            frameData.push({ timestamp, landmarks: result.landmarks[0] });
+        }
+        onProgress(`Analyzing motion... ${Math.round((i / frameCount) * 100)}%`);
+    }
+
+    // 3. Find key positions using heuristics
+    onProgress('Identifying key positions...');
+    if (frameData.length < 5) throw new Error("Could not find enough pose data. Please ensure the full swing is visible in the trimmed clip.");
+
+    const getWristsY = (landmarks: any[]) => (landmarks[15].y + landmarks[16].y) / 2;
+    const addressFrame = frameData[0];
+    const topFrame = [...frameData].sort((a, b) => getWristsY(a.landmarks) - getWristsY(b.landmarks))[0];
+    const topIndex = frameData.findIndex(f => f.timestamp === topFrame.timestamp);
+    const downswingFrames = frameData.slice(topIndex);
+    const impactFrame = downswingFrames.length > 0 ? [...downswingFrames].sort((a, b) => getWristsY(b.landmarks) - getWristsY(a.landmarks))[0] : frameData[frameData.length - 1];
+    const impactIndex = frameData.findIndex(f => f.timestamp === impactFrame.timestamp);
+    const followThroughFrames = frameData.slice(impactIndex);
+    const finishFrame = followThroughFrames.length > 0 ? [...followThroughFrames].sort((a, b) => getWristsY(a.landmarks) - getWristsY(b.landmarks))[0] : frameData[frameData.length - 1];
+    const takeawayTimestamp = addressFrame.timestamp + (topFrame.timestamp - addressFrame.timestamp) / 3;
+    const takeawayFrame = frameData.reduce((prev, curr) => Math.abs(curr.timestamp - takeawayTimestamp) < Math.abs(prev.timestamp - takeawayTimestamp) ? curr : prev);
+
+    const keyTimestamps: Record<string, number> = {
+        'P1: Address': addressFrame.timestamp,
+        'P2: Takeaway': takeawayFrame.timestamp,
+        'P3: Top of Swing': topFrame.timestamp,
+        'P4: Impact': impactFrame.timestamp,
+        'P5: Finish': finishFrame.timestamp,
+    };
+
+    // 4. Extract frame images for these timestamps
+    onProgress('Extracting key frames...');
+    const keyFrames: KeyFrame[] = [];
+    for (const position in keyTimestamps) {
+        const timestamp = keyTimestamps[position];
+        video.currentTime = timestamp;
+        await new Promise<void>(res => video.onseeked = () => res());
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const image = canvas.toDataURL('image/jpeg', 0.8);
+        keyFrames.push({ position, image });
+    }
+
+    // 5. Cleanup and return
+    URL.revokeObjectURL(video.src);
+    poseLandmarker.close();
+    return keyFrames;
+};
+
+
 const SwingStationModule: React.FC<{ className?: string }> = ({ className = '' }) => {
     const [view, setView] = useState<View>('idle');
     const [swingType, setSwingType] = useState<'Face On' | 'Down the Line' | null>(null);
@@ -175,6 +273,10 @@ const SwingStationModule: React.FC<{ className?: string }> = ({ className = '' }
     const [tags, setTags] = useState('');
     const [justSavedId, setJustSavedId] = useState<number | null>(null);
     const [viewingHistoryItem, setViewingHistoryItem] = useState<SwingHistoryEntry | null>(null);
+    
+    // New state for pose estimation results
+    const [keyFrames, setKeyFrames] = useState<KeyFrame[]>([]);
+
 
     const handleSelectSwingType = (type: 'Face On' | 'Down the Line') => {
         setSwingType(type);
@@ -200,6 +302,7 @@ const SwingStationModule: React.FC<{ className?: string }> = ({ className = '' }
         setView('analyzing');
         setError('');
         setAnalysisStep('Preparing video...');
+        setKeyFrames([]);
 
         const generateVisualDrill = async (analysisSummary: string) => {
             try {
@@ -238,79 +341,42 @@ const SwingStationModule: React.FC<{ className?: string }> = ({ className = '' }
                 }
             } catch (imageGenError) {
                 console.error("Failed to generate visual drill:", imageGenError);
-            } finally {
-                setAnalysisStep('');
             }
         };
         
         try {
-            const frames = await extractFramesFromVideo(videoFile, 15, setAnalysisStep, startTime, endTime);
-            setCapturedFrames(frames);
-            setAnalysisStep('Analyzing key positions...');
-
-            const imageParts = frames.map(frame => ({
-                inlineData: {
-                    mimeType: 'image/jpeg',
-                    data: frame,
-                },
-            }));
-            
-            const analysisPrompt = `
-                You are a world-renowned golf coach. Analyze the provided swing frames from a ${swingType} perspective and return your analysis in a structured JSON format. 
-                For each key position, provide a "Pro Tip" (ideal movement) and a "Corrective Drill" (an actionable exercise). 
-                The overall summary should be a brief, encouraging overview identifying the single most important area for improvement.
-            `;
-            
-            const swingPositionSchema = {
-                type: Type.OBJECT,
-                properties: {
-                    proTip: { type: Type.STRING, description: "What the ideal movement looks like." },
-                    correctiveDrill: { type: Type.STRING, description: "A specific, actionable exercise." },
-                },
-                required: ['proTip', 'correctiveDrill'],
-            };
-
-            const responseSchema = {
-                type: Type.OBJECT,
-                properties: {
-                    summary: { type: Type.STRING, description: "A brief, encouraging overview of the swing's characteristics." },
-                    breakdown: {
-                        type: Type.OBJECT,
-                        properties: {
-                            setup: swingPositionSchema,
-                            backswing: swingPositionSchema,
-                            topOfSwing: swingPositionSchema,
-                            downswing: swingPositionSchema,
-                            impact: swingPositionSchema,
-                            followThrough: swingPositionSchema,
-                        },
-                        required: ['setup', 'backswing', 'topOfSwing', 'downswing', 'impact', 'followThrough'],
-                    },
-                },
-                required: ['summary', 'breakdown'],
-            };
-
-            const contents = { parts: [{ text: analysisPrompt }, ...imageParts] };
-
-            const analysisResponse = await ai.models.generateContent({
-                model: 'gemini-2.5-pro',
-                contents: contents,
-                config: {
-                    responseMimeType: "application/json",
-                    responseSchema,
+            const geminiAnalysisPromise = (async () => {
+                const frames = await extractFramesFromVideo(videoFile, 15, (p) => setAnalysisStep(p), startTime, endTime);
+                setCapturedFrames(frames);
+                setAnalysisStep('Analyzing key positions with AI...');
+    
+                const imageParts = frames.map(frame => ({ inlineData: { mimeType: 'image/jpeg', data: frame } }));
+                const analysisPrompt = `You are a world-renowned golf coach. Analyze the provided swing frames from a ${swingType} perspective and return your analysis in a structured JSON format. For each key position, provide a "Pro Tip" (ideal movement) and a "Corrective Drill" (an actionable exercise). The overall summary should be a brief, encouraging overview identifying the single most important area for improvement.`;
+                const swingPositionSchema = { type: Type.OBJECT, properties: { proTip: { type: Type.STRING }, correctiveDrill: { type: Type.STRING } }, required: ['proTip', 'correctiveDrill'] };
+                const responseSchema = { type: Type.OBJECT, properties: { summary: { type: Type.STRING }, breakdown: { type: Type.OBJECT, properties: { setup: swingPositionSchema, backswing: swingPositionSchema, topOfSwing: swingPositionSchema, downswing: swingPositionSchema, impact: swingPositionSchema, followThrough: swingPositionSchema }, required: ['setup', 'backswing', 'topOfSwing', 'downswing', 'impact', 'followThrough'] } }, required: ['summary', 'breakdown'] };
+                const contents = { parts: [{ text: analysisPrompt }, ...imageParts] };
+    
+                const analysisResponse = await ai.models.generateContent({ model: 'gemini-2.5-pro', contents: contents, config: { responseMimeType: "application/json", responseSchema } });
+    
+                try {
+                    const analysisResult: SwingAnalysis = JSON.parse(analysisResponse.text);
+                    setAnalysis(analysisResult);
+                    return analysisResult;
+                } catch (jsonError) {
+                    console.error("Failed to parse JSON:", jsonError, "Raw:", analysisResponse.text);
+                    throw new Error("Received an invalid analysis format from the AI.");
                 }
-            });
+            })();
 
-            try {
-                const analysisResult: SwingAnalysis = JSON.parse(analysisResponse.text);
-                setAnalysis(analysisResult);
-                setView('result');
-                setAnalysisStep('Creating a visual drill...');
-                generateVisualDrill(analysisResult.summary);
-            } catch (jsonError) {
-                console.error("Failed to parse JSON response:", jsonError, "Raw response:", analysisResponse.text);
-                throw new Error("Received an invalid analysis format from the AI. Please try again.");
-            }
+            const poseAnalysisPromise = analyzePoseAndExtractKeyFrames(videoFile, startTime, endTime, (p) => setAnalysisStep(p))
+                .then(kfs => setKeyFrames(kfs));
+
+            const [analysisResult] = await Promise.all([geminiAnalysisPromise, poseAnalysisPromise]);
+            
+            setView('result');
+            setAnalysisStep('Creating a visual drill...');
+            await generateVisualDrill(analysisResult.summary);
+            setAnalysisStep('');
 
         } catch (err) {
             console.error(err);
@@ -343,6 +409,7 @@ const SwingStationModule: React.FC<{ className?: string }> = ({ className = '' }
         setAnalysis(null); setError(''); setGeneratedImage(null); setAnalysisStep('');
         setStartTime(0); setEndTime(null); setVideoDuration(null);
         setCapturedFrames([]); setTags(''); setJustSavedId(null); setViewingHistoryItem(null);
+        setKeyFrames([]);
         if(fileInputRef.current) fileInputRef.current.value = '';
     };
     
@@ -514,12 +581,39 @@ const SwingStationModule: React.FC<{ className?: string }> = ({ className = '' }
         const isSaved = justSavedId !== null;
 
         return (
-            <div className="p-4">
+            <div className="p-4 max-h-[75vh] overflow-y-auto pr-2">
                  {isViewingHistory && (
                     <div className="mb-4 bg-white/5 p-3 rounded-lg text-center">
                         <p className="text-caption">Viewing analysis from <span className="font-semibold text-indigo-300">{format(new Date(viewingHistoryItem.savedAt), 'MMMM d, yyyy')}</span></p>
                     </div>
                  )}
+                
+                <div className="mb-6">
+                    <h3 className="text-body-emphasis text-indigo-300 mb-4 flex items-center gap-2">
+                        <ImageIcon className="w-5 h-5" />
+                        Key Swing Positions
+                    </h3>
+                    {keyFrames.length > 0 ? (
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        {keyFrames.map(frame => (
+                            <div key={frame.position} className="text-center flex flex-col gap-2">
+                            <img src={frame.image} alt={`Key frame: ${frame.position}`} className="w-full rounded-lg border border-white/10" />
+                            <div>
+                                <h4 className="text-sm font-semibold">{frame.position}</h4>
+                                <p className="text-xs text-gray-400 mt-1 bg-black/30 p-2 rounded">AI Feedback coming soon...</p>
+                            </div>
+                            </div>
+                        ))}
+                        </div>
+                    ) : (
+                        <div className="w-full aspect-[2/1] bg-black/30 rounded-lg flex flex-col items-center justify-center text-center p-4">
+                            <LoaderIcon className="w-8 h-8 text-indigo-400 mb-4" />
+                            <p className="text-body-emphasis">Finalizing key frames...</p>
+                        </div>
+                    )}
+                </div>
+
+
                 <div className="mb-6">
                     <h3 className="text-body-emphasis text-indigo-300 mb-2 flex items-center gap-2">
                         <ImageIcon className="w-5 h-5" />
@@ -544,7 +638,7 @@ const SwingStationModule: React.FC<{ className?: string }> = ({ className = '' }
                     )}
                 </div>
 
-                <div className="bg-white/5 rounded-lg p-4 max-h-96 overflow-y-auto space-y-6">
+                <div className="bg-white/5 rounded-lg p-4 space-y-6">
                     <div>
                         <h2 className="text-module-header text-indigo-300 mb-2">Overall Summary</h2>
                         <p className="text-body">{analysis.summary}</p>
@@ -553,7 +647,6 @@ const SwingStationModule: React.FC<{ className?: string }> = ({ className = '' }
                     <div>
                         <h2 className="text-module-header text-indigo-300 mb-4">Detailed Breakdown</h2>
                         <div className="space-y-4">
-                            {/* FIX: Use Object.keys with a type assertion to provide correct types for the mapped values. */}
                             {(Object.keys(analysis.breakdown) as Array<keyof SwingAnalysis['breakdown']>).map((key) => {
                                 const value = analysis.breakdown[key];
                                 return (
@@ -611,6 +704,8 @@ const SwingStationModule: React.FC<{ className?: string }> = ({ className = '' }
             setAnalysis(item.analysis);
             setGeneratedImage(item.generatedImage);
             setViewingHistoryItem(item);
+            // Since we don't save keyframes in history, we'll reset them
+            setKeyFrames([]); 
             setView('result');
         };
 
