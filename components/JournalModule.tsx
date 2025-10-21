@@ -8,6 +8,7 @@ import BottomSheet from './BottomSheet';
 import AffirmationFormModal, { Affirmation } from './AffirmationFormModal';
 import { prompts as localPrompts } from '../services/prompts';
 import { affirmations as defaultAffirmations } from '../services/affirmations';
+import toast from 'react-hot-toast';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
@@ -344,6 +345,7 @@ const JournalModule: React.FC<{
       if (trimmedText) {
         const newEntry = { promptText: todaysPrompt, entryText: trimmedText };
         setEntries({ ...entries, [todayKey]: newEntry });
+        toast.success('Entry Saved! 📖');
         // Invalidate old analysis if entry changes
         if(analysisCache[todayKey]) {
             const newCache = {...analysisCache};
@@ -423,6 +425,7 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
     if (editingEntryKey) {
         const newEntry = { ...entries[editingEntryKey], entryText: editingEntryText };
         setEntries({ ...entries, [editingEntryKey]: newEntry });
+        toast.success('Entry Updated! 📖');
         // Invalidate old analysis
         if(analysisCache[editingEntryKey]) {
             const newCache = {...analysisCache};
@@ -631,8 +634,8 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
                 </button>
             </div>
             <div role="tablist" aria-label="Archive views" className="flex border-b border-white/10 mb-4">
-                <button role="tab" aria-selected={archiveTab === 'entries'} onClick={() => setArchiveTab('entries')} className={`px-4 py-2 text-sm font-semibold transition-colors ${archiveTab === 'entries' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'}`}>Entries</button>
-                <button role="tab" aria-selected={archiveTab === 'trends'} onClick={() => setArchiveTab('trends')} className={`px-4 py-2 text-sm font-semibold transition-colors ${archiveTab === 'trends' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'}`}>Trends</button>
+                <button role="tab" aria-selected={archiveTab === 'entries'} onClick={() => setArchiveTab('entries')} className={`px-4 py-2 text-sm font-semibold transition-colors ${archiveTab === 'entries' ? 'bg-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'}`}>Entries</button>
+                <button role="tab" aria-selected={archiveTab === 'trends'} onClick={() => setArchiveTab('trends')} className={`px-4 py-2 text-sm font-semibold transition-colors ${archiveTab === 'trends' ? 'bg-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'}`}>Trends</button>
             </div>
 
             {archiveTab === 'entries' && (
