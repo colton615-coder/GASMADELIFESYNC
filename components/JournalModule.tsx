@@ -6,6 +6,7 @@ import usePersistentState from '../hooks/usePersistentState';
 import { GoogleGenAI, Type } from '@google/genai';
 import BottomSheet from './BottomSheet';
 import AffirmationFormModal, { Affirmation } from './AffirmationFormModal';
+import { prompts as localPrompts } from '../services/prompts';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
@@ -240,6 +241,7 @@ const JournalModule: React.FC<{
   const [drafts, setDrafts] = usePersistentState<Record<string, string>>('journalDrafts', {});
   const [moods, setMoods] = usePersistentState<Record<string, MoodLog>>('moodLogs', {});
   const [analysisCache, setAnalysisCache] = usePersistentState<Record<string, JournalAnalysis>>('journalAnalysisCache', {});
+  const [lastPromptIndex, setLastPromptIndex] = usePersistentState<number>('journalLastPromptIndex', -1);
   
   const [affirmations, setAffirmations] = usePersistentState<Affirmation[]>('dailyAffirmations', DEFAULT_AFFIRMATIONS);
   const [isAffirmationModalOpen, setIsAffirmationModalOpen] = useState(false);
@@ -256,8 +258,6 @@ const JournalModule: React.FC<{
   const [editingEntryKey, setEditingEntryKey] = useState<string | null>(null);
   const [editingEntryText, setEditingEntryText] = useState<string>('');
   
-  const [isFetchingNewPrompt, setIsFetchingNewPrompt] = useState(false);
-
   // Analysis state
   const [isAnalyzing, setIsAnalyzing] = useState<Record<string, boolean>>({});
   const [activeTagFilter, setActiveTagFilter] = useState<string | null>(null);
@@ -298,42 +298,24 @@ const JournalModule: React.FC<{
     }
   }, [analysisCache, isAnalyzing, setAnalysisCache]);
 
-  const fetchNewPrompt = async (isInitial = false) => {
-    if (!isInitial) {
-        setIsFetchingNewPrompt(true);
-    }
-    try {
-        const currentPrompt = promptHistory[todayKey] || "";
-        const promptInstruction = `Generate a single, unique, and insightful journal prompt for self-reflection. The prompt should be a thought-provoking question. Do not include any introductory text like "Here is a prompt:". Do not wrap the prompt in quotation marks. Avoid generating a prompt similar to this one: "${currentPrompt}". Just return the prompt itself.`;
-        
-        const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: promptInstruction, config: { temperature: 1.0, maxOutputTokens: 60 } });
-        
-        let newPromptText = response.text?.trim() || "What's on your mind today?";
-        if (newPromptText.startsWith('"') && newPromptText.endsWith('"')) {
-            newPromptText = newPromptText.substring(1, newPromptText.length - 1);
-        }
-        setPromptHistory({ ...promptHistory, [todayKey]: newPromptText });
-    } catch (error) {
-        console.error("Failed to generate new journal prompt:", error);
-        if (isInitial) {
-            setPromptHistory({ ...promptHistory, [todayKey]: "What's on your mind today?" });
-        }
-    } finally {
-        if (isInitial) {
-            setIsReady(true);
-        } else {
-            setIsFetchingNewPrompt(false);
-        }
-    }
+  const handleCyclePrompt = () => {
+    const currentPromptText = promptHistory[todayKey] || '';
+    const currentIndex = localPrompts.findIndex(p => p.text === currentPromptText);
+    // Use a default index of -1 if not found, so the next is 0.
+    const newIndex = (currentIndex === -1 ? localPrompts.length -1 : currentIndex + 1) % localPrompts.length;
+    const newPrompt = localPrompts[newIndex];
+    setPromptHistory(prev => ({ ...prev, [todayKey]: newPrompt.text }));
   };
-
+  
   useEffect(() => {
     if (!promptHistory[todayKey]) {
-      fetchNewPrompt(true);
-    } else {
-      setIsReady(true);
+        const newIndex = (lastPromptIndex + 1) % localPrompts.length;
+        const newPrompt = localPrompts[newIndex];
+        setPromptHistory(prev => ({ ...prev, [todayKey]: newPrompt.text }));
+        setLastPromptIndex(newIndex);
     }
-  }, [promptHistory, todayKey]);
+    setIsReady(true);
+  }, [todayKey, promptHistory, lastPromptIndex, setPromptHistory, setLastPromptIndex]);
 
 
   useEffect(() => setIsFocusMode(view === 'focus'), [view, setIsFocusMode]);
@@ -556,12 +538,11 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
                           <div className="relative group min-h-[6rem] flex items-center justify-center">
                               <p className="text-lg font-serif text-gray-300 text-center px-10">{todaysPrompt}</p>
                               <button
-                                  onClick={() => fetchNewPrompt()}
-                                  disabled={isFetchingNewPrompt}
-                                  className="absolute top-1/2 right-0 -translate-y-1/2 p-2 rounded-full text-gray-500 hover:text-indigo-300 hover:bg-white/10 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-50"
+                                  onClick={handleCyclePrompt}
+                                  className="absolute top-1/2 right-0 -translate-y-1/2 p-2 rounded-full text-gray-500 hover:text-indigo-300 hover:bg-white/10 transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
                                   aria-label="Generate new prompt"
                               >
-                                  {isFetchingNewPrompt ? <LoaderIcon className="w-5 h-5"/> : <RefreshCwIcon className="w-5 h-5"/>}
+                                  <RefreshCwIcon className="w-5 h-5"/>
                               </button>
                           </div>
                           {isCompletedToday && !isWritingInline ? (

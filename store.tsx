@@ -8,7 +8,8 @@ const STORE_KEYS = [
     'workoutHistory', 'journalEntries', 'journalPromptHistory', 'journalDrafts',
     'moodLogs', 'journalAnalysisCache', 'dailyAffirmations', 'swingHistory',
     'biometricSettings', 'dismissedInsights', 'dailyAffirmationLog', 'lastSyncTime',
-    'adaptiveThemeSettings', 'journalSummaryCache', 'mindfulMomentsChat', 'weeklyReviewCache'
+    'adaptiveThemeSettings', 'journalSummaryCache', 'mindfulMomentsChat', 'weeklyReviewCache',
+    'journalLastPromptIndex'
 ];
 const MIGRATION_KEY = 'v1_indexeddb_migration_complete';
 

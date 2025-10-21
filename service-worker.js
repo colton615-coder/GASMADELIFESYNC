@@ -19,7 +19,7 @@ const STORE_KEYS = [
     'workoutHistory', 'journalEntries', 'journalPromptHistory', 'journalDrafts',
     'moodLogs', 'journalAnalysisCache', 'dailyAffirmations', 'swingHistory',
     'biometricSettings', 'dismissedInsights', 'dailyAffirmationLog', 'lastSyncTime',
-    'adaptiveThemeSettings', 'journalSummaryCache', 'mindfulMomentsChat'
+    'adaptiveThemeSettings', 'journalSummaryCache', 'mindfulMomentsChat', 'journalLastPromptIndex'
 ];
 
 const initDB = () => new Promise((resolve, reject) => {
@@ -153,55 +153,6 @@ self.addEventListener('fetch', (event) => {
     }).catch(() => caches.match('/offline.html'))
   );
 });
-
-// --- PERIODIC BACKGROUND SYNC HANDLER ---
-self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'content-sync') {
-    console.log('[SW] Periodic Sync triggered: fetching new content.');
-    event.waitUntil(syncJournalPrompts());
-  }
-});
-
-const syncJournalPrompts = async () => {
-  if (!geminiApiKey) {
-    console.warn('[SW] Periodic Sync: No API key available. Skipping prompt fetch.');
-    return;
-  }
-  console.log('[SW] Running background task: Sync Journal Prompts.');
-  try {
-    const promptHistoryResults = await dbGetAll('journalPromptHistory');
-    const promptHistory = promptHistoryResults.length > 0 ? promptHistoryResults[0].value : {};
-    
-    // Fetch prompts for the next 7 days if they don't exist
-    for (let i = 0; i < 7; i++) {
-      const date = new Date();
-      date.setDate(date.getDate() + i);
-      const dateKey = date.toISOString().split('T')[0];
-      
-      if (!promptHistory[dateKey]) {
-        console.log(`[SW] Fetching prompt for ${dateKey}`);
-        const promptInstruction = `Generate a single, unique, and insightful journal prompt for self-reflection. It should be a thought-provoking question. Return only the prompt itself, without quotes or introductory text.`;
-        
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: promptInstruction }] }] }),
-        });
-        
-        if (!response.ok) throw new Error(`API error: ${response.statusText}`);
-        
-        const data = await response.json();
-        const newPrompt = data.candidates[0].content.parts[0].text.trim();
-        promptHistory[dateKey] = newPrompt;
-      }
-    }
-    
-    await dbSet('journalPromptHistory', 'journalPromptHistory', promptHistory);
-    console.log('[SW] Journal prompts successfully synced for the next 7 days.');
-  } catch (error) {
-    console.error('[SW] Failed to sync journal prompts:', error);
-  }
-};
 
 // --- BACKGROUND FETCH EVENT HANDLERS ---
 self.addEventListener('backgroundfetchsuccess', (event) => {

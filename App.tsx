@@ -69,30 +69,6 @@ const AppContent: React.FC = () => {
     }
   }, []);
 
-  // Register for Periodic Background Sync
-  useEffect(() => {
-    const registerPeriodicSync = async () => {
-      const registration = await navigator.serviceWorker.ready;
-      if ('periodicSync' in registration) {
-        try {
-          // @ts-ignore
-          await registration.periodicSync.register('content-sync', {
-            minInterval: 6 * 60 * 60 * 1000, // 6 hours
-          });
-          console.log('Periodic Background Sync registered.');
-        } catch (error) {
-          console.error('Periodic Sync registration failed:', error);
-        }
-      } else {
-        console.log('Periodic Background Sync not supported.');
-      }
-    };
-
-    if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
-      registerPeriodicSync();
-    }
-  }, []);
-
   // Pass API key to Service Worker
   useEffect(() => {
     const passApiKeyToSw = async () => {

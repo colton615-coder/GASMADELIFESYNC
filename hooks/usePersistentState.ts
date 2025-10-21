@@ -9,7 +9,6 @@ import { useMemo } from 'react';
  * @param initialValue The initial value to return while data is loading.
  * @returns A state and a setter function.
  */
-// Fix: Update the setter's type to correctly accept functional updates.
 const usePersistentState = <T,>(key: string, initialValue: T): [T, (value: T | ((prevState: T) => T)) => void] => {
   const { data, setData, isLoaded } = useStore();
 
@@ -22,8 +21,17 @@ const usePersistentState = <T,>(key: string, initialValue: T): [T, (value: T | (
   }, [isLoaded, data, key, initialValue]);
 
   const setStateSlice = (newValue: T | ((prevState: T) => T)) => {
-    // Fix: Pass the updater function directly to the store's setData to avoid stale state.
-    setData(key, newValue);
+    // Fix: If newValue is a function, we must resolve it here.
+    // We use `stateSlice` as the previous state, which correctly falls back
+    // to `initialValue` if the data hasn't been loaded from the store yet.
+    // This prevents runtime errors when an updater function (e.g., `prev => ({ ...prev })`)
+    // receives `undefined` and attempts an invalid operation like spreading it.
+    if (typeof newValue === 'function') {
+      const updater = newValue as (prevState: T) => T;
+      setData(key, updater(stateSlice));
+    } else {
+      setData(key, newValue);
+    }
   };
 
   return [stateSlice, setStateSlice];
