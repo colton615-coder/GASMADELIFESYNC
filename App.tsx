@@ -19,6 +19,7 @@ import { LoaderIcon } from './components/icons';
 import useAdaptiveTheme from './hooks/useAdaptiveTheme';
 import MindfulMomentsModule from './components/MindfulMomentsModule';
 import WeeklyReviewModule from './components/WeeklyReviewModule';
+import MilestonesModule from './components/MilestonesModule';
 
 interface BiometricSettings {
     isEnabled: boolean;
@@ -93,6 +94,8 @@ const AppContent: React.FC = () => {
         return <CalendarModule />;
       case 'TASKS':
         return <TasksModule />;
+      case 'MILESTONES':
+        return <MilestonesModule />;
       case 'HABITS':
         return <HabitTrackerModule />;
       case 'SHOPPING':

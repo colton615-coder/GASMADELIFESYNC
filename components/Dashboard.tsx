@@ -6,6 +6,7 @@ import ProactiveSuggestions from './ProactiveSuggestions';
 import JournalInsightWidget from './JournalInsightWidget';
 import MindfulMomentsWidget from './MindfulMomentsWidget';
 import WeeklyReviewWidget from './WeeklyReviewWidget';
+import MilestonesWidget from './MilestonesWidget';
 
 const Dashboard: React.FC<{ 
   setActiveModule: (module: string) => void;
@@ -24,6 +25,7 @@ const Dashboard: React.FC<{
            <JournalInsightWidget setActiveModule={setActiveModule} setJournalLink={setJournalLink} /> 
         </div>
         <MindfulMomentsWidget setActiveModule={setActiveModule} />
+        <MilestonesWidget setActiveModule={setActiveModule} />
         <div className="lg:col-span-3">
             <DashboardStatsWidget setActiveModule={setActiveModule} />
         </div>

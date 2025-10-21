@@ -10,7 +10,8 @@ import {
     BookOpenIcon, 
     StatsIcon,
     SettingsIcon,
-    ClipboardCheckIcon
+    ClipboardCheckIcon,
+    FlagIcon
 } from './icons';
 
 interface NavButtonProps {
@@ -57,6 +58,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeModule, setActiveMo
         { id: 'DASHBOARD', label: 'Dashboard', icon: <HomeIcon /> },
         { id: 'CALENDAR', label: 'Calendar', icon: <CalendarDaysIcon /> },
         { id: 'TASKS', label: 'Tasks', icon: <TasksIcon /> },
+        { id: 'MILESTONES', label: 'Milestones', icon: <FlagIcon /> },
         { id: 'HABITS', label: 'Habits', icon: <RepeatIcon /> },
         { id: 'SHOPPING', label: 'Shopping', icon: <ShoppingCartIcon /> },
         { id: 'WORKOUT', label: 'Workout', icon: <DumbbellIcon /> },
