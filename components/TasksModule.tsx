@@ -6,6 +6,7 @@ import WheelPicker from './WheelPicker';
 import { format, parseISO, getDaysInMonth, isValid } from 'date-fns';
 import AnimatedCheckbox from './AnimatedCheckbox';
 import BottomSheet from './BottomSheet';
+import toast from 'react-hot-toast';
 
 type Priority = 'None' | 'Low' | 'Medium' | 'High';
 type SortOption = 'creationDate' | 'dueDate' | 'priority';
@@ -150,6 +151,7 @@ const TasksModule: React.FC<{ className?: string }> = ({ className = '' }) => {
     const taskToToggle = tasks.find(t => t.id === id);
     if (taskToToggle && !taskToToggle.completed) {
         setJustCompletedTaskId(id);
+        toast.success("Task completed! 🎉");
         setTimeout(() => setJustCompletedTaskId(null), 500); // match animation duration
     }
 

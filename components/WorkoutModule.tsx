@@ -899,6 +899,7 @@ const WorkoutSessionFocusView: React.FC<{
   const currentSetIndex = currentSets.findIndex(set => !set.completed);
   // FIX: The `sets` property might be a string when loaded from storage, causing a type error.
   // Explicitly cast to a number to ensure the arithmetic operation is valid.
+  // FIX: Cast `currentExercise.sets` to a number to prevent a TypeError on the arithmetic operation.
   const isLastSetOfExercise = currentSetIndex === Number(currentExercise.sets) - 1;
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;
 
@@ -917,6 +918,7 @@ const WorkoutSessionFocusView: React.FC<{
     const initialProgress: Record<string, CompletedSet[]> = {};
     plan.exercises.forEach(ex => {
       // FIX: Ensure `ex.sets` is treated as a number as it can be a string from storage.
+      // FIX: Cast `ex.sets` to a number as it may be a string from storage, which would cause `Array.from` to fail.
       initialProgress[ex.id] = Array.from({ length: Number(ex.sets) }).map(() => ({ reps: ex.reps, weight: ex.weight, completed: false }));
     });
     setSessionProgress(initialProgress);

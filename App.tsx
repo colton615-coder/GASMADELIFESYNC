@@ -19,6 +19,7 @@ import { LoaderIcon } from './components/icons';
 import useAdaptiveTheme from './hooks/useAdaptiveTheme';
 import MindfulMomentsModule from './components/MindfulMomentsModule';
 import WeeklyReviewModule from './components/WeeklyReviewModule';
+import { Toaster } from 'react-hot-toast';
 
 interface BiometricSettings {
     isEnabled: boolean;
@@ -132,6 +133,16 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen font-sans">
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: 'var(--color-surface-module)',
+            color: 'var(--color-text-primary)',
+            border: '1px solid var(--color-border)',
+          },
+        }}
+      />
       <StartupAffirmation 
         onAnimationComplete={() => setIsShowingAffirmation(false)} 
         activeModule={activeModule}

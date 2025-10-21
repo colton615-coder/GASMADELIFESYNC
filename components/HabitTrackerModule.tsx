@@ -4,6 +4,7 @@ import { RepeatIcon, PlusIcon, TrashIcon, CheckIcon, XIcon, FlameIcon, MinusIcon
 import usePersistentState from '../hooks/usePersistentState';
 import { format, subDays, startOfWeek, endOfWeek, eachDayOfInterval, getDay } from 'date-fns';
 import AnimatedCheckbox from './AnimatedCheckbox';
+import toast from 'react-hot-toast';
 
 interface Habit {
   id: number;
@@ -236,6 +237,15 @@ const HabitTrackerModule: React.FC<{ className?: string }> = ({ className = '' }
         let newProgress = (currentProgress === -1 && delta > 0) ? delta : Math.max(0, currentProgress + delta);
         const target = habit.target ?? 1;
         if (newProgress > target) { newProgress = target; }
+
+        // Check if habit is being completed right now
+        const wasCompleted = currentProgress >= target;
+        const isNowCompleted = newProgress >= target;
+
+        if (isNowCompleted && !wasCompleted) {
+          toast.success("Habit logged! Keep it up!");
+        }
+        
         newHistory[dateKey] = newProgress;
         return { ...habit, history: newHistory };
       }
