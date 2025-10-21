@@ -9,12 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "date-fns": "^3.6.0",
     "@google/genai": "^1.25.0",
+    "@sentry/react": "^10.20.0",
+    "date-fns": "^3.6.0",
+    "express": "^5.1.0",
     "firebase-functions": "^6.5.0",
-    "express": "^5.1.0"
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
