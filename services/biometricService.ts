@@ -16,7 +16,7 @@ const base64url = {
     for (let i = 0; i < len; i++) {
       bytes[i] = binary_string.charCodeAt(i);
     }
-    // Fix: Cast ArrayBufferLike to ArrayBuffer as the return type expects it.
+    // FIX: Cast ArrayBufferLike to ArrayBuffer as the return type expects it.
     return bytes.buffer as ArrayBuffer;
   }
 };
@@ -25,7 +25,7 @@ const getUserId = (): ArrayBuffer => {
     let userIdString = localStorage.getItem('biometricUserId');
     if (!userIdString) {
         const randomBytes = crypto.getRandomValues(new Uint8Array(16));
-        // Fix: Cast ArrayBufferLike to ArrayBuffer as encode function expects it.
+        // FIX: Cast ArrayBufferLike to ArrayBuffer as encode function expects it.
         userIdString = base64url.encode(randomBytes.buffer as ArrayBuffer);
         localStorage.setItem('biometricUserId', userIdString);
     }
