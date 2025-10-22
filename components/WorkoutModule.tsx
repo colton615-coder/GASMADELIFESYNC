@@ -1009,7 +1009,7 @@ const WorkoutSessionFocusView: React.FC<{
                   <div className="my-8"><p className="text-3xl text-blue-400 font-semibold mb-2">REST</p><p className="text-8xl font-mono font-bold">{restSeconds}</p><button onClick={() => setWorkoutState('working')} className="mt-4 px-4 py-2 text-sm bg-white/10 rounded-full">Skip Rest</button></div>
               ) : (
                   <div className="my-4">
-                      <h2 className="text-5xl font-semibold text-indigo-300">Set {currentSetIndex + 1}<span className="text-3xl text-gray-400">/{currentExercise.sets}</span></h2>
+                      <h2 className="text-5xl font-semibold text-indigo-300">Set {currentSetIndex + 1}<span className="text-3xl text-gray-400">/{numberOfSets}</span></h2>
                       <div className="grid grid-cols-2 gap-4 mt-6">
                           <button onClick={() => setEditingField('reps')} disabled={workoutState === 'paused'} className="bg-gray-800 p-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                               <label className="text-lg text-gray-400">Reps</label>
