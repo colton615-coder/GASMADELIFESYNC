@@ -24,9 +24,19 @@ const STORE_KEYS = [
 
 const initDB = () => new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
+    
     request.onerror = () => reject(new Error('Failed to open DB'));
-    request.onsuccess = () => resolve(request.result);
-    // Added robust onupgradeneeded handler for the service worker
+    
+    request.onsuccess = (event) => {
+        const db = event.target.result;
+        db.onversionchange = () => {
+            // The main app is likely trying to upgrade. Close this connection immediately.
+            db.close();
+            console.log('[SW] IndexedDB connection closed to allow version upgrade.');
+        };
+        resolve(db);
+    };
+
     request.onupgradeneeded = (event) => {
         const db = event.target.result;
         STORE_KEYS.forEach(key => {
@@ -37,6 +47,11 @@ const initDB = () => new Promise((resolve, reject) => {
         if (!db.objectStoreNames.contains('app_meta')) {
             db.createObjectStore('app_meta', { keyPath: 'key' });
         }
+    };
+    
+    request.onblocked = () => {
+        console.error('[SW] IndexedDB open request was blocked. Other connections may be open.');
+        reject(new Error('DB open blocked'));
     };
 });
 

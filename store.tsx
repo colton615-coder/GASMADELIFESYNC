@@ -14,15 +14,50 @@ const STORE_KEYS = [
 const MIGRATION_KEY = 'v1_indexeddb_migration_complete';
 
 // --- INDEXEDDB HELPER FUNCTIONS ---
-let dbPromise: Promise<IDBDatabase> | null = null;
+let dbInstance: IDBDatabase | null = null;
+let dbOpeningPromise: Promise<IDBDatabase> | null = null;
 
 const initDB = (): Promise<IDBDatabase> => {
-    if (dbPromise) return dbPromise;
+    if (dbInstance) {
+        return Promise.resolve(dbInstance);
+    }
+    if (dbOpeningPromise) {
+        return dbOpeningPromise;
+    }
 
-    dbPromise = new Promise((resolve, reject) => {
+    dbOpeningPromise = new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onerror = () => reject(new Error('Failed to open IndexedDB.'));
-        request.onsuccess = () => resolve(request.result);
+
+        const cleanup = () => {
+            dbOpeningPromise = null;
+        };
+
+        request.onerror = (event) => {
+            console.error('IndexedDB error:', (event.target as IDBOpenDBRequest).error);
+            cleanup();
+            reject(new Error('Failed to open IndexedDB.'));
+        };
+
+        request.onsuccess = (event) => {
+            dbInstance = (event.target as IDBOpenDBRequest).result;
+            
+            dbInstance.onversionchange = () => {
+                if (dbInstance) {
+                    dbInstance.close();
+                }
+                dbInstance = null;
+                console.warn("Database connection closing for version upgrade.");
+            };
+
+            dbInstance.onclose = () => {
+                dbInstance = null;
+                console.log("Database connection closed.");
+            };
+
+            cleanup();
+            resolve(dbInstance);
+        };
+        
         request.onupgradeneeded = (event) => {
             const db = (event.target as IDBOpenDBRequest).result;
             STORE_KEYS.forEach(key => {
@@ -30,34 +65,54 @@ const initDB = (): Promise<IDBDatabase> => {
                     db.createObjectStore(key, { keyPath: 'key' });
                 }
             });
-            // Store for migration flag
             if (!db.objectStoreNames.contains('app_meta')) {
                 db.createObjectStore('app_meta', { keyPath: 'key' });
             }
         };
+
+        request.onblocked = () => {
+            console.error("Database upgrade blocked. Please close other tabs of this application.");
+            cleanup();
+            reject(new Error("Database upgrade blocked."));
+        };
     });
-    return dbPromise;
+
+    return dbOpeningPromise;
 };
 
 const dbGet = async <T,>(storeName: string, key: string): Promise<T | undefined> => {
     const db = await initDB();
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(storeName, 'readonly');
-        const store = transaction.objectStore(storeName);
-        const request = store.get(key);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result?.value);
+        try {
+            const transaction = db.transaction(storeName, 'readonly');
+            const store = transaction.objectStore(storeName);
+            const request = store.get(key);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result?.value);
+        } catch (error) {
+            if (error instanceof DOMException && error.name === 'InvalidStateError') {
+                dbInstance = null;
+            }
+            reject(error);
+        }
     });
 };
 
 const dbSet = async (storeName: string, key: string, value: any): Promise<void> => {
     const db = await initDB();
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(storeName, 'readwrite');
-        const store = transaction.objectStore(storeName);
-        const request = store.put({ key, value });
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve();
+        try {
+            const transaction = db.transaction(storeName, 'readwrite');
+            const store = transaction.objectStore(storeName);
+            const request = store.put({ key, value });
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve();
+        } catch (error) {
+            if (error instanceof DOMException && error.name === 'InvalidStateError') {
+                dbInstance = null;
+            }
+            reject(error);
+        }
     });
 };
 
@@ -65,19 +120,27 @@ const dbGetAllData = async (): Promise<Record<string, any>> => {
     const db = await initDB();
     const data: Record<string, any> = {};
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(STORE_KEYS, 'readonly');
-        transaction.onerror = () => reject(transaction.error);
-        transaction.oncomplete = () => resolve(data);
-        
-        STORE_KEYS.forEach(storeName => {
-            const store = transaction.objectStore(storeName);
-            const request = store.getAll();
-            request.onsuccess = () => {
-                if (request.result.length > 0) {
-                    data[storeName] = request.result[0].value;
-                }
-            };
-        });
+        try {
+            const transaction = db.transaction(STORE_KEYS, 'readonly');
+            transaction.onerror = () => reject(transaction.error);
+            transaction.oncomplete = () => resolve(data);
+            
+            STORE_KEYS.forEach(storeName => {
+                const store = transaction.objectStore(storeName);
+                const request = store.getAll();
+                request.onsuccess = () => {
+                    if (request.result.length > 0) {
+                        data[storeName] = request.result[0].value;
+                    }
+                };
+            });
+        } catch (error) {
+             if (error instanceof DOMException && error.name === 'InvalidStateError') {
+                console.warn('DB connection was closing during getAll. Invalidating.');
+                dbInstance = null; 
+            }
+            reject(error);
+        }
     });
 };
 
@@ -157,7 +220,9 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const currentSlice = prevData[key];
             const newSliceValue = typeof value === 'function' ? value(currentSlice) : value;
             const newData = { ...prevData, [key]: newSliceValue };
-            dbSet(key, key, newSliceValue);
+            dbSet(key, key, newSliceValue).catch(error => {
+                console.error(`Failed to save data for key "${key}" to IndexedDB`, error);
+            });
             return newData;
         });
     }, []);
@@ -166,5 +231,6 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };
+
 // Exporting DB functions for service worker to import (conceptually)
 export const db = { initDB, dbGetAllData, dbSet };
