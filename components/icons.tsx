@@ -37,8 +37,13 @@ export const DumbbellIcon: React.FC<IconProps> = (props) => (
   <svg {...commonProps} {...props}><path d="M14.4 14.4 9.6 9.6M9.6 14.4 14.4 9.6M21 12c0-2.2-1.8-4-4-4h-2.2l-2.8-2.8a2.8 2.8 0 0 0-4 0L5.2 8H3c-2.2 0-4 1.8-4 4s1.8 4 4 4h2.2l2.8 2.8a2.8 2.8 0 0 0 4 0l2.8-2.8H17c2.2 0 4-1.8 4-4Z"/></svg>
 );
 
+// FIX: Add the missing GolfIcon component
 export const GolfIcon: React.FC<IconProps> = (props) => (
-    <svg {...commonProps} {...props}><path d="M18 18h-8a4 4 0 0 1-4-4V6a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v0"/><circle cx="18" cy="18" r="2"/></svg>
+    <svg {...commonProps} {...props}>
+        <circle cx="12.5" cy="12.5" r="1.5"></circle>
+        <path d="M12 22v-6.5l6.5-6.5H22"></path>
+        <path d="M12.5 12.5 6 19s-2-2-2-6 2-6 6-6h2s4 0 6 2l-6 6Z"></path>
+    </svg>
 );
 
 export const BookOpenIcon: React.FC<IconProps> = (props) => (

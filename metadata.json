@@ -1,7 +1,5 @@
 {
   "name": "Life Sync",
   "description": "An integrated platform to act as a personal assistant, therapist, trainer, and coach, designed to eliminate chaos by keeping all important aspects of daily life within one area.",
-  "requestFramePermissions": [
-    "camera"
-  ]
+  "requestFramePermissions": []
 }

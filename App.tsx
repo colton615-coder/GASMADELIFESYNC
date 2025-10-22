@@ -6,7 +6,6 @@ import TasksModule from './components/TasksModule';
 import HabitTrackerModule from './components/HabitTrackerModule';
 import ShoppingListModule from './components/ShoppingListModule';
 import WorkoutModule from './components/WorkoutModule';
-import SwingStationModule from './components/SwingStationModule';
 import JournalModule from './components/JournalModule';
 import StatsModule from './components/StatsModule';
 import StartupAffirmation from './components/StartupAffirmation';
@@ -100,8 +99,6 @@ const AppContent: React.FC = () => {
         return <ShoppingListModule />;
       case 'WORKOUT':
         return <WorkoutModule />;
-      case 'SWING':
-        return <SwingStationModule />;
       case 'JOURNAL':
         return <JournalModule setIsFocusMode={setIsFocusMode} startInFocus={startInFocus} journalLink={journalLink} setJournalLink={setJournalLink} />;
       case 'STATS':
