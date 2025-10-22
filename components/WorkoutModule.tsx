@@ -903,7 +903,7 @@ const WorkoutSessionFocusView: React.FC<{
   const currentSets = sessionProgress[currentExercise.id] || [];
   const currentSetIndex = currentSets.findIndex(set => !set.completed);
   // Fix: Cast `currentExercise.sets` to a Number to allow for the arithmetic operation, as data from storage might be a string.
-  const isLastSetOfExercise = currentSetIndex === Number(currentExercise.sets) - 1;
+  const isLastSetOfExercise = currentSetIndex === (currentExercise.sets as number) - 1;
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;
 
   const playSound = useCallback((type: 'work' | 'rest') => {
@@ -921,7 +921,7 @@ const WorkoutSessionFocusView: React.FC<{
     const initialProgress: Record<string, CompletedSet[]> = {};
     plan.exercises.forEach(ex => {
       // Fix: Cast `ex.sets` to a Number because `Array.from` expects a number for the length property and data from storage can be a string.
-      initialProgress[ex.id] = Array.from({ length: Number(ex.sets) }).map(() => ({ reps: ex.reps, weight: ex.weight, completed: false }));
+      initialProgress[ex.id] = Array.from({ length: ex.sets as number }).map(() => ({ reps: ex.reps, weight: ex.weight, completed: false }));
     });
     setSessionProgress(initialProgress);
   }, [plan]);

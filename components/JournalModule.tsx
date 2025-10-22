@@ -9,7 +9,7 @@ import AffirmationFormModal, { Affirmation } from './AffirmationFormModal';
 import { prompts as localPrompts } from '../services/prompts';
 import { affirmations as defaultAffirmations } from '../services/affirmations';
 import toast from 'react-hot-toast';
-import { logToDailyLog } from '../utils/logToDailyLog.js';
+import { logToDailyLog } from '../services/logService';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
@@ -348,17 +348,17 @@ const JournalModule: React.FC<{
     }
   }, [entries, drafts, setDrafts]);
 
-  const handleSaveEntry = (text: string) => {
+  const handleSaveEntry = useCallback((text: string) => {
+    console.log("TEST: About to call logToDailyLog...");
     if (todaysPrompt) {
       const trimmedText = text.trim();
       if (trimmedText) {
         const newEntry = { promptText: todaysPrompt, entryText: trimmedText };
-        setEntries({ ...entries, [todayKey]: newEntry });
+        setEntries(prev => ({ ...prev, [todayKey]: newEntry }));
         toast.success('Entry Saved! 📖');
         
         logToDailyLog('JOURNAL', { mood: todaysMood?.mood || null, text: trimmedText, prompt: todaysPrompt });
         
-        // Invalidate old analysis if entry changes
         if(analysisCache[todayKey]) {
             const newCache = {...analysisCache};
             delete newCache[todayKey];
@@ -371,7 +371,7 @@ const JournalModule: React.FC<{
         setDrafts(newDrafts);
       }
     }
-  };
+  }, [todaysPrompt, todayKey, todaysMood, drafts, analysisCache, setEntries, setDrafts, setAnalysisCache]);
   
   const generateMonthlySummary = async () => {
     setIsGeneratingSummary(true);
@@ -430,7 +430,13 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
   };
   const handleMoodNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => { if (moods[todayKey]) { setMoods({ ...moods, [todayKey]: { ...moods[todayKey], note: e.target.value } }); } };
   const handleBeginWriting = () => { setInlineText(drafts[todayKey] || ''); setIsWritingInline(true); };
-  const handleSaveInlineEntry = () => { handleSaveEntry(inlineText); setIsWritingInline(false); setInlineText(''); };
+  
+  const handleSaveInlineEntry = useCallback(() => { 
+      handleSaveEntry(inlineText); 
+      setIsWritingInline(false); 
+      setInlineText(''); 
+  }, [handleSaveEntry, inlineText]);
+
   const handleCancelInlineWrite = () => { handleAutoSave(inlineText, todayKey); setIsWritingInline(false); setInlineText(''); };
   const handleEnterFocusMode = () => setView('focus');
   const handleCloseFocus = () => setView('today');
