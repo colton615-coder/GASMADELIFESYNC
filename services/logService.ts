@@ -1,5 +1,5 @@
 // Task 2: The Unified Log Function
-import { db } from '../firebase';
+import { db } from '../firebase.js';
 import { collection, addDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
 
