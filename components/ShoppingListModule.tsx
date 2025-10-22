@@ -3,6 +3,7 @@ import Module from './Module';
 import { ShoppingCartIcon, PlusIcon, PencilIcon, TrashIcon, CheckIcon, XIcon } from './icons';
 import usePersistentState from '../hooks/usePersistentState';
 import AnimatedCheckbox from './AnimatedCheckbox';
+import { logToDailyLog } from '../services/logService';
 
 interface ShoppingItem {
   id: number;
@@ -98,6 +99,7 @@ const ShoppingListModule: React.FC<{ className?: string }> = ({ className = '' }
       category: trimmedCategory || null,
     };
     setItems([...items, newItem]);
+    logToDailyLog('shopping_item_added', { text: newItem.text, category: newItem.category || 'none' });
 
     if (trimmedCategory) {
         setItemCategoryMap({ ...itemCategoryMap, [trimmedText.toLowerCase()]: trimmedCategory });
@@ -112,6 +114,10 @@ const ShoppingListModule: React.FC<{ className?: string }> = ({ className = '' }
   };
 
   const toggleItemCompletion = (id: number) => {
+    const itemToToggle = items.find(item => item.id === id);
+    if (itemToToggle && !itemToToggle.completed) {
+        logToDailyLog('shopping_item_completed', { itemId: id, text: itemToToggle.text });
+    }
     setItems(
       items.map(item =>
         item.id === id ? { ...item, completed: !item.completed } : item

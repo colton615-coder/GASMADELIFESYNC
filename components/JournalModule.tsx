@@ -9,6 +9,7 @@ import AffirmationFormModal, { Affirmation } from './AffirmationFormModal';
 import { prompts as localPrompts } from '../services/prompts';
 import { affirmations as defaultAffirmations } from '../services/affirmations';
 import toast from 'react-hot-toast';
+import { logToDailyLog } from '../services/logService';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
@@ -354,6 +355,8 @@ const JournalModule: React.FC<{
         const newEntry = { promptText: todaysPrompt, entryText: trimmedText };
         setEntries({ ...entries, [todayKey]: newEntry });
         toast.success('Entry Saved! 📖');
+        // Task 3: Example Usage
+        logToDailyLog('journal_entry_saved', { prompt: todaysPrompt, length: trimmedText.length });
         // Invalidate old analysis if entry changes
         if(analysisCache[todayKey]) {
             const newCache = {...analysisCache};
@@ -420,7 +423,10 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
     return Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).map(([tag]) => tag);
   }, [analysisCache]);
 
-  const handleMoodSelect = (moodName: string) => { setMoods({ ...moods, [todayKey]: { mood: moodName, note: moods[todayKey]?.note || '' } }); };
+  const handleMoodSelect = (moodName: string) => { 
+    setMoods({ ...moods, [todayKey]: { mood: moodName, note: moods[todayKey]?.note || '' } }); 
+    logToDailyLog('mood_logged', { mood: moodName });
+  };
   const handleMoodNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => { if (moods[todayKey]) { setMoods({ ...moods, [todayKey]: { ...moods[todayKey], note: e.target.value } }); } };
   const handleBeginWriting = () => { setInlineText(drafts[todayKey] || ''); setIsWritingInline(true); };
   const handleSaveInlineEntry = () => { handleSaveEntry(inlineText); setIsWritingInline(false); setInlineText(''); };
@@ -434,6 +440,7 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
         const newEntry = { ...entries[editingEntryKey], entryText: editingEntryText };
         setEntries({ ...entries, [editingEntryKey]: newEntry });
         toast.success('Entry Updated! 📖');
+        logToDailyLog('journal_entry_updated', { date: editingEntryKey, length: editingEntryText.length });
         // Invalidate old analysis
         if(analysisCache[editingEntryKey]) {
             const newCache = {...analysisCache};

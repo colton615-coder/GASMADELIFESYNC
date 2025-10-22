@@ -4,6 +4,7 @@ import { DumbbellIcon, PlusIcon, XIcon, TrashIcon, ChevronLeftIcon, PencilIcon, 
 import { format, parseISO } from 'date-fns';
 import usePersistentState from '../hooks/usePersistentState';
 import BottomSheet from './BottomSheet';
+import { logToDailyLog } from '../services/logService';
 
 
 // --- DATA & TYPES ---
@@ -162,6 +163,7 @@ const WorkoutModule: React.FC<{ className?: string }> = ({ className = '' }) => 
     };
 
     setWorkoutHistory([newHistoryRecord, ...workoutHistory]);
+    logToDailyLog('workout_completed', { planId: activePlan.id, planName: activePlan.name, exercises: completedExercises.length });
     setActivePlan(null);
     setView('list');
   };
@@ -198,6 +200,7 @@ const WorkoutModule: React.FC<{ className?: string }> = ({ className = '' }) => 
     };
 
     setWorkoutHistory([newHistoryRecord, ...workoutHistory]);
+    logToDailyLog('workout_quick_logged', { planId: planToLog.id, planName: planToLog.name, exercises: completedExercises.length });
     setConfirmingLogPlan(null);
   };
 
@@ -235,7 +238,9 @@ const WorkoutModule: React.FC<{ className?: string }> = ({ className = '' }) => 
     if (planToSave.id) {
       setWorkoutPlans(workoutPlans.map(p => p.id === planToSave.id ? (planToSave as WorkoutPlan) : p));
     } else {
-      setWorkoutPlans([...workoutPlans, { ...planToSave, id: Date.now() } as WorkoutPlan]);
+      const newPlan = { ...planToSave, id: Date.now() } as WorkoutPlan;
+      setWorkoutPlans([...workoutPlans, newPlan]);
+      logToDailyLog('workout_plan_created', { planId: newPlan.id, planName: newPlan.name, exercises: newPlan.exercises.length });
     }
     setView('list');
   };

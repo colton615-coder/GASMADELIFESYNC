@@ -7,6 +7,7 @@ import { format, parseISO, getDaysInMonth, isValid } from 'date-fns';
 import AnimatedCheckbox from './AnimatedCheckbox';
 import BottomSheet from './BottomSheet';
 import toast from 'react-hot-toast';
+import { logToDailyLog } from '../services/logService';
 
 type Priority = 'None' | 'Low' | 'Medium' | 'High';
 type SortOption = 'creationDate' | 'dueDate' | 'priority';
@@ -138,6 +139,7 @@ const TasksModule: React.FC<{ className?: string }> = ({ className = '' }) => {
       priority: newPriority,
     };
     setTasks([newTask, ...tasks]);
+    logToDailyLog('task_added', { text: newTask.text, priority: newTask.priority, hasDueDate: !!newTask.dueDate });
     setNewTaskText('');
     setNewDueDate(null);
     setNewPriority('None');
@@ -152,6 +154,7 @@ const TasksModule: React.FC<{ className?: string }> = ({ className = '' }) => {
     if (taskToToggle && !taskToToggle.completed) {
         setJustCompletedTaskId(id);
         toast.success("Task completed! 🎉");
+        logToDailyLog('task_completed', { taskId: id, text: taskToToggle.text });
         setTimeout(() => setJustCompletedTaskId(null), 500); // match animation duration
     }
 

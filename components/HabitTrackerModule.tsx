@@ -5,6 +5,7 @@ import usePersistentState from '../hooks/usePersistentState';
 import { format, subDays, startOfWeek, endOfWeek, eachDayOfInterval, getDay } from 'date-fns';
 import AnimatedCheckbox from './AnimatedCheckbox';
 import toast from 'react-hot-toast';
+import { logToDailyLog } from '../services/logService';
 
 interface Habit {
   id: number;
@@ -224,6 +225,7 @@ const HabitTrackerModule: React.FC<{ className?: string }> = ({ className = '' }
       schedule: scheduleValue,
     };
     setHabits([...habits, newHabit]);
+    logToDailyLog('habit_added', { name: newHabit.name, hasTarget: !!newHabit.target });
     setNewHabitName(''); setNewHabitIcon('✨'); setNewHabitTarget(''); setNewHabitUnit(''); setNewHabitSchedule([]);
     setIsAdding(false);
   };
@@ -244,6 +246,7 @@ const HabitTrackerModule: React.FC<{ className?: string }> = ({ className = '' }
 
         if (isNowCompleted && !wasCompleted) {
           toast.success("Habit logged! Keep it up!");
+          logToDailyLog('habit_completed', { habitId: habit.id, name: habit.name });
         }
         
         newHistory[dateKey] = newProgress;

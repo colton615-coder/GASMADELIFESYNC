@@ -4,6 +4,7 @@ import { GolfIcon, UploadIcon, SparklesIcon, AlertTriangleIcon, ImageIcon, Chevr
 import { GoogleGenAI, Modality, Type } from '@google/genai';
 import usePersistentState from '../hooks/usePersistentState';
 import { format } from 'date-fns';
+import { logToDailyLog } from '../services/logService';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
@@ -400,6 +401,7 @@ const SwingStationModule: React.FC<{ className?: string }> = ({ className = '' }
         };
 
         setSwingHistory([newEntry, ...swingHistory]);
+        logToDailyLog('swing_analysis_saved', { swingType: newEntry.swingType, tags: newEntry.tags });
         setJustSavedId(newEntry.id);
     };
 

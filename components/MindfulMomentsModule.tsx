@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { GoogleGenAI, Chat } from '@google/genai';
 import usePersistentState from '../hooks/usePersistentState';
 import { XIcon, BrainCircuitIcon, LoaderIcon } from './icons';
+import { logToDailyLog } from '../services/logService';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
@@ -22,6 +23,11 @@ const MindfulMomentsModule: React.FC<{
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [streamingMessage, setStreamingMessage] = useState<ChatMessage | null>(null);
 
+  const historyRef = useRef(history);
+  useEffect(() => {
+    historyRef.current = history;
+  }, [history]);
+
   const systemInstruction = `You are "Aura", a compassionate and insightful AI coach from the Life Sync app. Your purpose is to help users reflect on their day, manage stress, and work towards their goals. You are not a licensed therapist, but you can provide a safe space for users to talk and offer guidance based on cognitive-behavioral therapy (CBT) and mindfulness principles. Keep your responses encouraging, empathetic, and relatively brief. Ask open-ended questions to guide the user's reflection. Start the conversation with a warm and gentle greeting if the history is empty.`;
 
   useEffect(() => {
@@ -41,6 +47,9 @@ const MindfulMomentsModule: React.FC<{
     
     return () => {
         setIsFocusMode(false);
+        if (historyRef.current.length > 1) { // Only log if there was an interaction
+            logToDailyLog('mindful_moment_chat_ended', { messageCount: historyRef.current.length });
+        }
     };
   }, [setIsFocusMode]); // Only run on mount and unmount
 
