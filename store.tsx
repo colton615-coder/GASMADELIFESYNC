@@ -6,7 +6,7 @@ const DB_VERSION = 2; // Incremented version to trigger upgrade for existing use
 const STORE_KEYS = [
     'tasks', 'habits', 'shoppingListItems', 'itemCategoryMap', 'workoutPlans',
     'workoutHistory', 'journalEntries', 'journalPromptHistory', 'journalDrafts',
-    'moodLogs', 'journalAnalysisCache', 'dailyAffirmations', 'swingHistory',
+    'moodLogs', 'journalAnalysisCache', 'dailyAffirmations',
     'biometricSettings', 'dismissedInsights', 'dailyAffirmationLog', 'lastSyncTime',
     'adaptiveThemeSettings', 'journalSummaryCache', 'mindfulMomentsChat', 'weeklyReviewCache',
     'journalLastPromptIndex'

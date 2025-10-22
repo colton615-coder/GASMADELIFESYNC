@@ -904,7 +904,9 @@ const WorkoutSessionFocusView: React.FC<{
   const currentSetIndex = currentSets.findIndex(set => !set.completed);
   // FIX: Explicitly cast `currentExercise.sets` to a Number to handle cases where it might be a string from storage.
   // Fix: Ensure the result of Number() is not NaN before performing arithmetic, which could happen with corrupted data.
-  const isLastSetOfExercise = currentSetIndex === (Number(currentExercise.sets) || 0) - 1;
+  // The original one-liner was causing a TS error, so we split it for clarity and to help type inference.
+  const numberOfSets = Number(currentExercise.sets) || 0;
+  const isLastSetOfExercise = currentSetIndex === numberOfSets - 1;
   const isLastExercise = currentExerciseIndex === plan.exercises.length - 1;
 
   const playSound = useCallback((type: 'work' | 'rest') => {

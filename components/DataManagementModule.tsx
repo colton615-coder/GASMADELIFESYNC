@@ -6,7 +6,7 @@ import { DatabaseIcon, DownloadIcon } from './icons';
 const DATA_KEYS = [
     'tasks', 'habits', 'shoppingListItems', 'itemCategoryMap', 'workoutPlans',
     'workoutHistory', 'journalEntries', 'journalPromptHistory', 'journalDrafts',
-    'moodLogs', 'journalAnalysisCache', 'dailyAffirmations', 'swingHistory',
+    'moodLogs', 'journalAnalysisCache', 'dailyAffirmations',
     'biometricSettings', 'dismissedInsights', 'dailyAffirmationLog', 'lastSyncTime',
     'adaptiveThemeSettings', 'journalSummaryCache', 'mindfulMomentsChat', 'journalLastPromptIndex'
 ];
