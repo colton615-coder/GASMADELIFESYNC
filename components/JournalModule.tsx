@@ -9,7 +9,7 @@ import AffirmationFormModal, { Affirmation } from './AffirmationFormModal';
 import { prompts as localPrompts } from '../services/prompts';
 import { affirmations as defaultAffirmations } from '../services/affirmations';
 import toast from 'react-hot-toast';
-import { logToDailyLog } from '../services/logService';
+import { logToDailyLog } from '../utils/logToDailyLog.js';
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
@@ -355,8 +355,9 @@ const JournalModule: React.FC<{
         const newEntry = { promptText: todaysPrompt, entryText: trimmedText };
         setEntries({ ...entries, [todayKey]: newEntry });
         toast.success('Entry Saved! 📖');
-        // Task 3: Example Usage
-        logToDailyLog('journal_entry_saved', { prompt: todaysPrompt, length: trimmedText.length });
+        
+        logToDailyLog('JOURNAL', { mood: todaysMood?.mood || null, text: trimmedText, prompt: todaysPrompt });
+        
         // Invalidate old analysis if entry changes
         if(analysisCache[todayKey]) {
             const newCache = {...analysisCache};
