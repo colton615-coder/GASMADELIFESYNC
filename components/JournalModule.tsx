@@ -126,6 +126,7 @@ const FocusMode: React.FC<{
   }, [onAutoSave]);
 
   const handleSaveAndClose = () => {
+      console.log("TEST: Focus Mode Save Button Clicked!");
       onSave(text);
       onClose();
   }
@@ -440,6 +441,7 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
   const handleBeginWriting = () => { setInlineText(drafts[todayKey] || ''); setIsWritingInline(true); };
   
   const handleSaveInlineEntry = useCallback(() => { 
+      console.log("TEST: Inline Save Button Clicked!");
       handleSaveEntry(inlineText); 
       setIsWritingInline(false); 
       setInlineText(''); 
