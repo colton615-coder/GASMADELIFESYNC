@@ -11,7 +11,7 @@ import { affirmations as defaultAffirmations } from '../services/affirmations';
 import toast from 'react-hot-toast';
 import { logToDailyLog } from '../services/logService';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY as string });
 
 // --- DATA SCHEMAS ---
 interface JournalEntry {
