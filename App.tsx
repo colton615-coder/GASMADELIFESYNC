@@ -5,10 +5,10 @@ import usePersistentState from './hooks/usePersistentState';
 import BiometricLockScreen from './components/BiometricLockScreen';
 import StartupAffirmation from './components/StartupAffirmation';
 import NavigationBar from './components/NavigationBar';
-import DashboardPage from './pages/DashboardPage'; // Kept as a standard import
 import LoadingSpinner from './components/LoadingSpinner';
 
 // Lazy-loaded components
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const JournalPage = lazy(() => import('./pages/JournalPage'));
 const TasksPage = lazy(() => import('./pages/TasksPage'));
 const HabitsPage = lazy(() => import('./pages/HabitsPage'));
