@@ -118,61 +118,7 @@ self.addEventListener('message', (event) => {
 
 // --- FETCH HANDLER ---
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-
-  // Handle synthetic request for background fetch data export
-  if (url.pathname === '/generate-backup') {
-    event.respondWith(
-      (async () => {
-        console.log('[SW] Generating backup file for background fetch...');
-        const allData = {};
-        const db = await initDB();
-        const transaction = db.transaction(STORE_KEYS, 'readonly');
-        
-        await Promise.all(STORE_KEYS.map(storeName => {
-            return new Promise(resolve => {
-                const store = transaction.objectStore(storeName);
-                const request = store.getAll();
-                request.onsuccess = () => {
-                    if (request.result.length > 0) {
-                        allData[storeName] = request.result[0].value;
-                    }
-                    resolve();
-                };
-            });
-        }));
-        
-        const jsonString = JSON.stringify(allData, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        const headers = { 'Content-Type': 'application/json', 'Content-Disposition': 'attachment; filename="life-sync-backup.json"' };
-        return new Response(blob, { headers });
-      })()
-    );
-    return;
-  }
-  
-  if (request.method === 'POST') {
-    // For ALL POST requests, bypass the cache and fetch directly.
-    event.respondWith(fetch(request));
-    return; // Important: Exit the listener here.
-  }
-  
-  // Stale-While-Revalidate for other requests
-  event.respondWith(
-    caches.match(request).then(cachedResponse => {
-      const fetchPromise = fetch(request).then(networkResponse => {
-        caches.open(DYNAMIC_CACHE_NAME).then(cache => {
-          if (networkResponse.ok && request.method === 'GET') {
-            cache.put(request, networkResponse.clone());
-            limitCacheSize(DYNAMIC_CACHE_NAME, DYNAMIC_CACHE_MAX_ENTRIES);
-          }
-        });
-        return networkResponse;
-      });
-      return cachedResponse || fetchPromise;
-    }).catch(() => caches.match('/offline.html'))
-  );
+  // Do nothing - just let the browser handle the fetch normally for now.
 });
 
 // --- BACKGROUND FETCH EVENT HANDLERS ---
