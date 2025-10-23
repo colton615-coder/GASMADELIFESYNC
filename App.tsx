@@ -5,7 +5,7 @@ import usePersistentState from './hooks/usePersistentState';
 import BiometricLockScreen from './components/BiometricLockScreen';
 import StartupAffirmation from './components/StartupAffirmation';
 import NavigationBar from './components/NavigationBar';
-import DashboardPage from './pages/DashboardPage'; // Kept as a standard import
+import DashboardPage from './pages/dashboard/DashboardPage'; // Kept as a standard import
 import LoadingSpinner from './components/ui/LoadingSpinner'; // Corrected path
 
 // Lazy-loaded components
