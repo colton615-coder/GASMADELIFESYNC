@@ -31,7 +31,7 @@ const JournalInsightWidget: React.FC<JournalInsightWidgetProps> = ({ setActiveMo
         }
 
         try {
-            const response = await fetch('/api/journal/insight', {
+            const response = await fetch('/.netlify/functions/journal-insight', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -40,8 +40,9 @@ const JournalInsightWidget: React.FC<JournalInsightWidgetProps> = ({ setActiveMo
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `API request failed with status ${response.status}`);
+                // Don't try to parse JSON on a 404 or other non-JSON error.
+                const errorText = await response.text();
+                throw new Error(`API request failed with status ${response.status}: ${errorText}`);
             }
 
             const data = await response.json();
