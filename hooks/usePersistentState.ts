@@ -1,5 +1,5 @@
 import { useStore } from '../store';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 /**
  * An adapter hook that uses the central IndexedDB store but provides
@@ -9,16 +9,19 @@ import { useMemo } from 'react';
  * @param initialValue The initial value to return while data is loading.
  * @returns A state and a setter function.
  */
-const usePersistentState = <T,>(key: string, initialValue: T): [T, (value: T | ((prevState: T) => T)) => void] => {
+const usePersistentState = <T,>(key: string, initialValue: T | (() => T)): [T, (value: T | ((prevState: T) => T)) => void] => {
   const { data, setData, isLoaded } = useStore();
+
+  // Lazily initialize the state only once.
+  const [initialState] = useState(initialValue);
 
   const stateSlice = useMemo(() => {
     // While loading, or if data for this key doesn't exist, return the initial value.
     if (!isLoaded || data[key] === undefined) {
-      return initialValue;
+      return initialState;
     }
     return data[key] as T;
-  }, [isLoaded, data, key, initialValue]);
+  }, [isLoaded, data, key, initialState]);
 
   const setStateSlice = (newValue: T | ((prevState: T) => T)) => {
     // Fix: If newValue is a function, we must resolve it here.

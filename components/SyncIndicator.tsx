@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { RefreshCwIcon, LoaderIcon } from './icons';
 
 const SyncIndicator: React.FC = () => {
-    const [lastSyncTime, setLastSyncTime] = usePersistentState<string>('lastSyncTime', new Date().toISOString());
+    const [lastSyncTime, setLastSyncTime] = usePersistentState<string>('lastSyncTime', () => new Date().toISOString());
     const [timeAgo, setTimeAgo] = useState('just now');
     const [isSyncing, setIsSyncing] = useState(false);
 
