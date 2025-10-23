@@ -1,7 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import usePersistentState from '../hooks/usePersistentState';
 import Module from './Module';
 import { StatsIcon, ChevronRightIcon } from './icons';
 import { subDays, format, parseISO, isAfter } from 'date-fns';
+
+interface Task {
+  id: number;
+  text: string;
+  completed: boolean;
+  completedAt?: string | null;
+}
+
+interface Habit {
+    id: string;
+    name: string;
+    goal: number;
+    frequency: 'daily' | 'weekly';
+    history: Record<string, boolean>;
+}
 
 // Simplified Sparkline component for the dashboard
 const Sparkline: React.FC<{ data: number[]; className?: string }> = ({ data, className = '' }) => {
@@ -34,6 +50,8 @@ const Sparkline: React.FC<{ data: number[]; className?: string }> = ({ data, cla
 };
 
 const DashboardStatsWidget: React.FC<{ setActiveModule: (module: string) => void }> = ({ setActiveModule }) => {
+    const [tasks] = usePersistentState<Task[]>('tasks', []);
+    const [habits] = usePersistentState<Habit[]>('habits', []);
     const [taskTrend, setTaskTrend] = useState<number[]>([]);
     const [habitTrend, setHabitTrend] = useState<number[]>([]);
 
@@ -42,8 +60,6 @@ const DashboardStatsWidget: React.FC<{ setActiveModule: (module: string) => void
         const calculateTrends = () => {
             try {
                 // Task trend: tasks completed per day for last 7 days
-                const storedTasksRaw = localStorage.getItem('tasks');
-                const tasks = storedTasksRaw ? JSON.parse(storedTasksRaw).data : [];
                 const taskCompletionsByDay: number[] = [];
                 for (let i = 6; i >= 0; i--) {
                     const date = subDays(new Date(), i);
@@ -53,8 +69,6 @@ const DashboardStatsWidget: React.FC<{ setActiveModule: (module: string) => void
                 setTaskTrend(taskCompletionsByDay);
 
                 // Habit trend: completion % per day for last 7 days
-                const storedHabitsRaw = localStorage.getItem('habits');
-                const habits = storedHabitsRaw ? JSON.parse(storedHabitsRaw).data : [];
                 const habitCompletionByDay: number[] = [];
                 if (habits.length > 0) {
                      for (let i = 6; i >= 0; i--) {
@@ -75,7 +89,7 @@ const DashboardStatsWidget: React.FC<{ setActiveModule: (module: string) => void
         calculateTrends();
         const interval = setInterval(calculateTrends, 5000);
         return () => clearInterval(interval);
-    }, []);
+    }, [tasks, habits]);
 
     const StatTrendCard = ({ label, sparklineData, unit = '' }: { label: string, sparklineData: number[], unit?: string }) => (
         <div className="flex items-center justify-between bg-white/5 p-4 rounded-lg">
