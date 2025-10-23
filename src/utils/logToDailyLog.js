@@ -1,4 +1,4 @@
-import { db } from "../firebase.js";
+import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 
 /**
@@ -7,12 +7,6 @@ import { collection, addDoc } from "firebase/firestore";
  * @param {Object} data - The JSON payload for the event.
  */
 export const logToDailyLog = async (type, data) => {
-  // This check is crucial to prevent errors if Firebase initialization fails.
-  if (!db) {
-    console.log(`[Firestore Logging Disabled] Event: ${type}`, { data });
-    return;
-  }
-
   if (!type || !data) {
     console.error("Error: logToDailyLog requires a 'type' and 'data' object.");
     return;

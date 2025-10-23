@@ -1,8 +1,8 @@
-import { initializeApp, getApps } from "firebase/app";
+// src/firebase.js
+import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-// This config is duplicated from firebase.ts to ensure this module can stand alone
-// and robustly provide the same singleton instance.
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyC8Hk-CbMVdV1eU2ixaFf2v4uZWWH3iIzz8",
   authDomain: "sf2025-be6b2.firebaseapp.com",
@@ -12,7 +12,10 @@ const firebaseConfig = {
   appId: "1:215593793023:web:8b4d814f121302cd1263ca"
 };
 
-const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Initialize and export Firestore - ensure this happens AFTER initializeApp
 const db = getFirestore(app);
 
 export { db };
