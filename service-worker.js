@@ -152,12 +152,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Stale-While-Revalidate for non-API requests
-  if (request.method === 'POST' && url.hostname.includes('aistudio.google.com')) {
-    // Don't cache POST requests to the AI service.
-    return;
+  if (request.method === 'POST') {
+    // For ALL POST requests, bypass the cache and fetch directly.
+    event.respondWith(fetch(request));
+    return; // Important: Exit the listener here.
   }
   
+  // Stale-While-Revalidate for other requests
   event.respondWith(
     caches.match(request).then(cachedResponse => {
       const fetchPromise = fetch(request).then(networkResponse => {
