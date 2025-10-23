@@ -1,5 +1,5 @@
 import React from 'react';
-import Dashboard from '../Components/Dashboard/Dashboard';
+import Dashboard from '../components/Dashboard';
 
 interface DashboardPageProps {
     setActiveModule: (module: string) => void;
