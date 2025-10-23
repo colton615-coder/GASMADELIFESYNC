@@ -4,7 +4,7 @@ import usePersistentState from '../hooks/usePersistentState';
 import { XIcon, BrainCircuitIcon, LoaderIcon } from './icons';
 import { logToDailyLog } from '../services/logService';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY as string });
 
 interface ChatMessage {
     role: 'user' | 'model';
