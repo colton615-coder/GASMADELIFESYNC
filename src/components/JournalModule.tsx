@@ -11,7 +11,7 @@ import { affirmations as defaultAffirmations } from '../services/affirmations';
 import toast from 'react-hot-toast';
 import { logToDailyLog } from '../services/logService';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY as string });
 
 // --- DATA SCHEMAS ---
 interface JournalEntry {
@@ -126,6 +126,7 @@ const FocusMode: React.FC<{
   }, [onAutoSave]);
 
   const handleSaveAndClose = () => {
+      console.log("TEST: Focus Mode Save Button Clicked!");
       onSave(text);
       onClose();
   }
@@ -293,8 +294,11 @@ const JournalModule: React.FC<{
                 }
             }
         });
-        const analysisResult = JSON.parse(response.text.trim()) as JournalAnalysis;
-        setAnalysisCache(prev => ({ ...prev, [dateKey]: analysisResult }));
+        const text = response.text;
+        if (text) {
+            const analysisResult = JSON.parse(text.trim()) as JournalAnalysis;
+            setAnalysisCache(prev => ({ ...prev, [dateKey]: analysisResult }));
+        }
     } catch (error) {
         console.error("Failed to analyze journal entry:", error);
     } finally {
@@ -405,7 +409,7 @@ List up to 5 common keywords or concepts that appeared frequently.
 Here is the data:\n${monthEntries.join('\n---\n')}`;
 
         const response = await ai.models.generateContent({ model: 'gemini-2.5-pro', contents: prompt });
-        setMonthlySummary(response.text);
+        setMonthlySummary(response.text ?? '');
 
     } catch (error) {
         console.error("Failed to generate monthly summary:", error);
@@ -437,6 +441,7 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
   const handleBeginWriting = () => { setInlineText(drafts[todayKey] || ''); setIsWritingInline(true); };
   
   const handleSaveInlineEntry = useCallback(() => { 
+      console.log("TEST: Inline Save Button Clicked!");
       handleSaveEntry(inlineText); 
       setIsWritingInline(false); 
       setInlineText(''); 
@@ -489,7 +494,9 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
         const existingAffirmations = affirmations.map(a => `- "${a.text}"`).join('\n');
         const prompt = `Generate a JSON array of 5 unique, short, and empowering affirmations. Do not repeat any of the following existing affirmations:\n${existingAffirmations}\n\nReturn only the JSON array of strings.`;
         const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt, config: { responseMimeType: 'application/json' } });
-        setSuggestedAffirmations(JSON.parse(response.text.trim()));
+        if (response.text) {
+            setSuggestedAffirmations(JSON.parse(response.text.trim()));
+        }
     } catch (e) { console.error("Failed to suggest affirmations:", e); } 
     finally { setIsSuggesting(false); }
   };

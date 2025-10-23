@@ -16,6 +16,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["."],
-  "exclude": ["node_modules", "netlify/functions"]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

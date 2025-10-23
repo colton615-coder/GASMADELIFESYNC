@@ -5,7 +5,7 @@ import usePersistentState from './hooks/usePersistentState';
 import BiometricLockScreen from './components/BiometricLockScreen';
 import StartupAffirmation from './components/StartupAffirmation';
 import NavigationBar from './components/NavigationBar';
-import LoadingSpinner from './components/LoadingSpinner';
+import LoadingSpinner from './components/ui/LoadingSpinner';
 
 // Lazy-loaded components
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
@@ -18,6 +18,7 @@ const App: React.FC = () => {
   const [isLocked, setIsLocked] = usePersistentState('isAppLocked', true);
   const [isStartupAnimationDone, setIsStartupAnimationDone] = useState(false);
   const [activeModule, setActiveModule] = useState('DASHBOARD');
+  const [journalLink, setJournalLink] = useState<string | null>(null);
 
   if (isLocked) {
     return <BiometricLockScreen onUnlock={() => setIsLocked(false)} />;
@@ -37,7 +38,7 @@ const App: React.FC = () => {
         <main className="flex-1 overflow-y-auto">
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-              <Route path="/" element={<DashboardPage setActiveModule={setActiveModule} />} />
+              <Route path="/" element={<DashboardPage setActiveModule={setActiveModule} setJournalLink={setJournalLink} />} />
               <Route path="/journal" element={<JournalPage />} />
               <Route path="/tasks" element={<TasksPage />} />
               <Route path="/habits" element={<HabitsPage />} />
