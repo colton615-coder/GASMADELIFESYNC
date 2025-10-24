@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { GoogleGenAI, Chat } from '@google/genai';
-import usePersistentState from '../hooks/usePersistentState';
-import { XIcon, BrainCircuitIcon, LoaderIcon } from './icons';
-import { logToDailyLog } from '../services/logService';
+import usePersistentState from '@/hooks/usePersistentState';
+import { XIcon, BrainCircuitIcon, LoaderIcon } from '@/components/icons';
+import { logToDailyLog } from '@/services/logService';
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY as string });
 
@@ -68,7 +68,7 @@ const MindfulMomentsModule: React.FC<{
     const userMessage: ChatMessage = { role: 'user', parts: [{ text: textToSend }] };
     
     if (!isInitial) {
-      setHistory(prev => [...prev, userMessage]);
+      setHistory((prev: ChatMessage[]) => [...prev, userMessage]);
     }
     
     setStreamingMessage({ role: 'model', parts: [{ text: '' }] });
@@ -118,7 +118,7 @@ const MindfulMomentsModule: React.FC<{
       
       <main className="flex-grow w-full max-w-3xl mx-auto overflow-y-auto mb-4 pr-2">
         <div className="space-y-6">
-            {displayedMessages.map((msg, index) => (
+            {displayedMessages.map((msg: ChatMessage, index: number) => (
                 <div key={index} className={`flex items-end gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     {msg.role === 'model' && <div className="w-8 h-8 rounded-full bg-indigo-500/50 flex items-center justify-center flex-shrink-0"><BrainCircuitIcon className="w-5 h-5 text-indigo-200"/></div>}
                     <div className={`max-w-md md:max-w-lg p-4 rounded-2xl text-body break-words ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-700/80 text-gray-200 rounded-bl-none'}`}>

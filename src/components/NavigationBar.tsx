@@ -10,7 +10,7 @@ import {
     StatsIcon,
     SettingsIcon,
     ClipboardCheckIcon
-} from './icons';
+} from '@/components/icons';
 
 interface NavButtonProps {
     icon: React.ReactNode;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import usePersistentState from '../hooks/usePersistentState';
-import { ClipboardCheckIcon, LoaderIcon, SparklesIcon, XIcon } from './icons';
+import usePersistentState from '@/hooks/usePersistentState';
+import { ClipboardCheckIcon, LoaderIcon, SparklesIcon, XIcon } from '@/components/icons';
 import { format, subDays, getWeek, parseISO, isWithinInterval } from 'date-fns';
 
 // --- TYPE DEFINITIONS ---
@@ -76,19 +76,19 @@ const WeeklyReviewModule: React.FC<{
             const sevenDaysAgo = subDays(new Date(), 7);
             const today = new Date();
 
-            const weeklyTasks = tasks.filter(task => 
+            const weeklyTasks = tasks.filter((task: Task) => 
                 task.completedAt && isWithinInterval(parseISO(task.completedAt), { start: sevenDaysAgo, end: today })
             );
 
             const weeklyJournal = Object.entries(journalEntries)
                 .filter(([date]) => isWithinInterval(parseISO(date), { start: sevenDaysAgo, end: today }))
-                .map(([date, entry]) => ({
+                .map(([date, entry]: [string, JournalEntry]) => ({
                     date,
                     mood: moods[date]?.mood,
                     entryText: entry.entryText.replace(/<[^>]*>?/gm, '') // Sanitize HTML
                 }));
                 
-            const weeklyHabits = habits.map(habit => {
+            const weeklyHabits = habits.map((habit: Habit) => {
                 let completedDays = 0;
                 let totalDays = 0;
                 for (let i = 0; i < 7; i++) {
@@ -124,7 +124,7 @@ const WeeklyReviewModule: React.FC<{
             const newReview = data.weeklyReview.trim();
 
             setReview(newReview);
-            setReviewCache(prev => ({ ...prev, [cacheKey]: newReview }));
+            setReviewCache((prev: Record<string, string>) => ({ ...prev, [cacheKey]: newReview }));
 
         } catch (err) {
             console.error("Failed to generate weekly review:", err);

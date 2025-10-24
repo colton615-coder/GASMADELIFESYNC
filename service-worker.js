@@ -117,10 +117,6 @@ self.addEventListener('message', (event) => {
 });
 
 // --- FETCH HANDLER ---
-self.addEventListener('fetch', (event) => {
-  // Do nothing - just let the browser handle the fetch normally for now.
-});
-
 // --- BACKGROUND FETCH EVENT HANDLERS ---
 self.addEventListener('backgroundfetchsuccess', (event) => {
   console.log('[SW] Background fetch success:', event.registration.id);

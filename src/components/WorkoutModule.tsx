@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import Module from './Module';
-import { DumbbellIcon, PlusIcon, XIcon, TrashIcon, ChevronLeftIcon, PencilIcon, CheckIcon, CalendarIcon, RepeatIcon, ChevronUpIcon, ChevronDownIcon, FileTextIcon, TimerIcon, ClipboardCheckIcon, PlayIcon, PauseIcon, RotateCcwIcon, ChevronRightIcon, DeleteIcon, GripVerticalIcon } from './icons';
+import Module from '@/components/Module';
+import { DumbbellIcon, PlusIcon, XIcon, TrashIcon, ChevronLeftIcon, PencilIcon, CheckIcon, CalendarIcon, RepeatIcon, ChevronUpIcon, ChevronDownIcon, FileTextIcon, TimerIcon, ClipboardCheckIcon, PlayIcon, PauseIcon, RotateCcwIcon, ChevronRightIcon, DeleteIcon, GripVerticalIcon } from '@/components/icons';
 import { format, parseISO } from 'date-fns';
-import usePersistentState from '../hooks/usePersistentState';
-import BottomSheet from './BottomSheet';
-import { logToDailyLog } from '../services/logService';
+import usePersistentState from '@/hooks/usePersistentState';
+import BottomSheet from '@/components/BottomSheet';
+import { logToDailyLog } from '@/services/logService';
 
 
 // --- DATA & TYPES ---

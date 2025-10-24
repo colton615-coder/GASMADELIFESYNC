@@ -1,7 +1,7 @@
 import React from 'react';
-import usePersistentState from '../hooks/usePersistentState';
+import usePersistentState from '@/hooks/usePersistentState';
 import { format, parseISO } from 'date-fns';
-import { TasksIcon, BookOpenIcon, RepeatIcon, ChevronRightIcon, CheckIcon } from './icons';
+import { TasksIcon, BookOpenIcon, RepeatIcon, ChevronRightIcon, CheckIcon } from '@/components/icons';
 
 // Types from other modules
 type Priority = 'None' | 'Low' | 'Medium' | 'High';
@@ -23,8 +23,8 @@ const FocusBlock: React.FC<{ setActiveModule: (module: string) => void }> = ({ s
 
     // --- Find Critical Task ---
     const criticalTask = tasks
-        .filter(t => !t.completed)
-        .sort((a, b) => {
+        .filter((t: Task) => !t.completed)
+        .sort((a: Task, b: Task) => {
             const priorityA = priorityOrder[a.priority || 'None'];
             const priorityB = priorityOrder[b.priority || 'None'];
             if (priorityA !== priorityB) return priorityB - priorityA;
@@ -40,7 +40,7 @@ const FocusBlock: React.FC<{ setActiveModule: (module: string) => void }> = ({ s
     const journalPrompt = promptHistory[todayKey];
 
     // --- Find Next Habit ---
-    const nextHabit = habits.find(h => !h.history[todayKey]);
+    const nextHabit = habits.find((h: Habit) => !h.history[todayKey]);
 
     const FocusItem: React.FC<{
         icon: React.ReactNode;

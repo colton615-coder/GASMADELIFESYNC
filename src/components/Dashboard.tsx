@@ -1,11 +1,11 @@
 import React from 'react';
-import DashboardStatsWidget from './DashboardStatsWidget';
-import DataManagementModule from './DataManagementModule';
-import TodayWidgetView from './TodayWidgetView';
-import ProactiveSuggestions from './ProactiveSuggestions';
-import JournalInsightWidget from './JournalInsightWidget';
-import MindfulMomentsWidget from './MindfulMomentsWidget';
-import WeeklyReviewWidget from './WeeklyReviewWidget';
+import DashboardStatsWidget from '@/components/DashboardStatsWidget';
+import DataManagementModule from '@/components/DataManagementModule';
+import TodayWidgetView from '@/components/TodayWidgetView';
+import ProactiveSuggestions from '@/components/ProactiveSuggestions';
+import JournalInsightWidget from '@/components/JournalInsightWidget';
+import MindfulMomentsWidget from '@/components/MindfulMomentsWidget';
+import WeeklyReviewWidget from '@/components/WeeklyReviewWidget';
 
 const Dashboard: React.FC<{ 
   setActiveModule: (module: string) => void;

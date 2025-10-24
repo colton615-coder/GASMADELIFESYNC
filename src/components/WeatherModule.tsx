@@ -1,7 +1,7 @@
 
 import React from 'react';
-import Module from './Module';
-import { SunIcon, CloudIcon, ZapIcon, CloudRainIcon } from './icons';
+import Module from '@/components/Module';
+import { SunIcon, CloudIcon, ZapIcon, CloudRainIcon } from '@/components/icons';
 
 const WeatherModule: React.FC = () => {
   // Mock data

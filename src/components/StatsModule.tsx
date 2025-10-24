@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import Module from './Module';
-import { StatsIcon, CheckIcon, RepeatIcon, DumbbellIcon, SmileIcon } from './icons';
+import Module from '@/components/Module';
+import { StatsIcon, CheckIcon, RepeatIcon, DumbbellIcon, SmileIcon } from '@/components/icons';
 import { format, subDays, eachDayOfInterval, startOfWeek, getDay, parseISO, isAfter } from 'date-fns';
 
 // --- Reusable Chart Components ---

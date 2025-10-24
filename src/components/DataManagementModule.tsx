@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Module from './Module';
-import { DatabaseIcon, DownloadIcon } from './icons';
+import Module from '@/components/Module';
+import { DatabaseIcon, DownloadIcon } from '@/components/icons';
 
 // Data keys are now sourced from the central store for consistency.
 const DATA_KEYS = [

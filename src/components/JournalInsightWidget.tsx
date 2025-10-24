@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import usePersistentState from '../hooks/usePersistentState';
-import { BookOpenIcon, SparklesIcon, LoaderIcon, ChevronRightIcon } from './icons';
+import usePersistentState from '@/hooks/usePersistentState';
+import { BookOpenIcon, SparklesIcon, LoaderIcon, ChevronRightIcon } from '@/components/icons';
 import { format, subDays, parseISO, isAfter } from 'date-fns';
 
 // Types from JournalModule

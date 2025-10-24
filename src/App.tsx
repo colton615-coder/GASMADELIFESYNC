@@ -1,28 +1,43 @@
-import React, { Suspense, lazy, useState } from 'react'; // Added useState
+import React, { Suspense, lazy, useState, useEffect } from 'react'; // Added useState
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import usePersistentState from './hooks/usePersistentState';
-import BiometricLockScreen from './components/BiometricLockScreen';
-import StartupAffirmation from './components/StartupAffirmation';
-import NavigationBar from './components/NavigationBar';
-import LoadingSpinner from './components/ui/LoadingSpinner';
+import StartupAffirmation from '@/components/StartupAffirmation';
+import NavigationBar from '@/components/NavigationBar';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Lazy-loaded components
-const DashboardPage = lazy(() => import('./pages/DashboardPage'));
-const JournalPage = lazy(() => import('./pages/JournalPage'));
-const TasksPage = lazy(() => import('./pages/TasksPage'));
-const HabitsPage = lazy(() => import('./pages/HabitsPage'));
-const WorkoutsPage = lazy(() => import('./pages/WorkoutsPage'));
+const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
+const JournalPage = lazy(() => import('@/pages/JournalPage'));
+const TasksPage = lazy(() => import('@/pages/TasksPage'));
+const HabitsPage = lazy(() => import('@/pages/HabitsPage'));
+const WorkoutsPage = lazy(() => import('@/pages/WorkoutsPage'));
+
+function usePersistentState<T>(key: string, defaultValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+  const [state, setState] = useState<T>(() => {
+    try {
+      const storedValue = window.localStorage.getItem(key);
+      return storedValue !== null ? JSON.parse(storedValue) : defaultValue;
+    } catch (error) {
+      console.error(`Error reading localStorage key “${key}”:`, error);
+      return defaultValue;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(key, JSON.stringify(state));
+    } catch (error) {
+      console.error(`Error setting localStorage key “${key}”:`, error);
+    }
+  }, [key, state]);
+
+  return [state, setState];
+}
 
 const App: React.FC = () => {
-  const [isLocked, setIsLocked] = usePersistentState('isAppLocked', true);
   const [isStartupAnimationDone, setIsStartupAnimationDone] = useState(false);
   const [activeModule, setActiveModule] = useState('DASHBOARD');
   const [journalLink, setJournalLink] = useState<string | null>(null);
-
-  if (isLocked) {
-    return <BiometricLockScreen onUnlock={() => setIsLocked(false)} />;
-  }
 
   return (
     <Router>

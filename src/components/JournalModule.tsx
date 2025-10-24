@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import Module from './Module';
-import { BookOpenIcon, PencilIcon, ArchiveIcon, ChevronLeftIcon, CheckIcon, HeartIcon, PlusIcon, TrashIcon, ChevronRightIcon, SparklesIcon, QuoteIcon, TagIcon, BarChartIcon, LoaderIcon, RefreshCwIcon } from './icons';
+import Module from '@/components/Module';
+import { BookOpenIcon, PencilIcon, ArchiveIcon, ChevronLeftIcon, CheckIcon, HeartIcon, PlusIcon, TrashIcon, ChevronRightIcon, SparklesIcon, QuoteIcon, TagIcon, BarChartIcon, LoaderIcon, RefreshCwIcon } from '@/components/icons';
 import { format, parseISO, subDays, startOfMonth, endOfMonth, eachDayOfInterval, isWithinInterval } from 'date-fns';
-import usePersistentState from '../hooks/usePersistentState';
+import usePersistentState from '@/hooks/usePersistentState';
 import { GoogleGenAI, Type } from '@google/genai';
-import BottomSheet from './BottomSheet';
-import AffirmationFormModal, { Affirmation } from './AffirmationFormModal';
-import { prompts as localPrompts } from '../services/prompts';
-import { affirmations as defaultAffirmations } from '../services/affirmations';
+import BottomSheet from '@/components/BottomSheet';
+import AffirmationFormModal, { Affirmation } from '@/components/AffirmationFormModal';
+import { prompts as localPrompts } from '@/services/prompts';
+import { affirmations as defaultAffirmations } from '@/services/affirmations';
 import toast from 'react-hot-toast';
-import { logToDailyLog } from '../services/logService';
+import { logToDailyLog } from '@/services/logService';
 
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY as string });
 

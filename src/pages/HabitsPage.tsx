@@ -1,5 +1,5 @@
 import React from 'react';
-import HabitTrackerModule from '../components/HabitTrackerModule';
+import HabitTrackerModule from '@/components/HabitTrackerModule';
 
 const HabitsPage: React.FC = () => {
     return <HabitTrackerModule />;

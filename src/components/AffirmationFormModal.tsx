@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import BottomSheet from './BottomSheet';
+import BottomSheet from '@/components/BottomSheet';
 
 export interface Affirmation {
   id: string;

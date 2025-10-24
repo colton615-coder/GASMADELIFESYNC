@@ -1,11 +1,11 @@
 import React, { useState, FormEvent, useMemo, useEffect } from 'react';
-import Module from './Module';
-import { RepeatIcon, PlusIcon, TrashIcon, CheckIcon, XIcon, FlameIcon, MinusIcon, SkipForwardIcon, RotateCcwIcon } from './icons';
-import usePersistentState from '../hooks/usePersistentState';
+import Module from '@/components/Module';
+import { RepeatIcon, PlusIcon, TrashIcon, CheckIcon, XIcon, FlameIcon, MinusIcon, SkipForwardIcon, RotateCcwIcon } from '@/components/icons';
+import usePersistentState from '@/hooks/usePersistentState';
 import { format, subDays, startOfWeek, endOfWeek, eachDayOfInterval, getDay } from 'date-fns';
-import AnimatedCheckbox from './AnimatedCheckbox';
+import AnimatedCheckbox from '@/components/AnimatedCheckbox';
 import toast from 'react-hot-toast';
-import { logToDailyLog } from '../services/logService';
+import { logToDailyLog } from '@/services/logService';
 
 interface Habit {
   id: number;
@@ -193,15 +193,15 @@ const HabitTrackerModule: React.FC<{ className?: string }> = ({ className = '' }
 
   const habitsDueToday = useMemo(() => {
     const today = new Date();
-    return habits.filter(habit => isScheduledForDay(habit, today));
+    return habits.filter((habit: Habit) => isScheduledForDay(habit, today));
   }, [habits]);
 
   useEffect(() => {
     const migrationKey = 'habitsMigrationV2_quantity';
     if (localStorage.getItem(migrationKey)) return;
-    const needsMigration = habits.some(habit => Object.values(habit.history).some(value => typeof (value as any) === 'boolean'));
+    const needsMigration = habits.some((habit: Habit) => Object.values(habit.history).some(value => typeof (value as any) === 'boolean'));
     if (needsMigration) {
-        const migratedHabits = habits.map(habit => {
+        const migratedHabits = habits.map((habit: Habit) => {
             const newHistory: { [date: string]: number } = {};
             Object.entries(habit.history).forEach(([date, value]) => { newHistory[date] = Number(value as any); });
             return { ...habit, history: newHistory };
@@ -232,7 +232,7 @@ const HabitTrackerModule: React.FC<{ className?: string }> = ({ className = '' }
 
   const updateHabitProgress = (habitId: number, date: Date, delta: number) => {
     const dateKey = format(date, 'yyyy-MM-dd');
-    setHabits(habits.map(habit => {
+    setHabits(habits.map((habit: Habit) => {
       if (habit.id === habitId) {
         const newHistory = { ...habit.history };
         const currentProgress = newHistory[dateKey] ?? 0;
@@ -258,7 +258,7 @@ const HabitTrackerModule: React.FC<{ className?: string }> = ({ className = '' }
 
   const handleSkipDay = (habitId: number, date: Date) => {
     const dateKey = format(date, 'yyyy-MM-dd');
-    setHabits(habits.map(habit => {
+    setHabits(habits.map((habit: Habit) => {
         if (habit.id === habitId) {
             const newHistory = { ...habit.history, [dateKey]: -1 };
             return { ...habit, history: newHistory };
@@ -269,7 +269,7 @@ const HabitTrackerModule: React.FC<{ className?: string }> = ({ className = '' }
 
   const handleUnskipDay = (habitId: number, date: Date) => {
     const dateKey = format(date, 'yyyy-MM-dd');
-    setHabits(habits.map(habit => {
+    setHabits(habits.map((habit: Habit) => {
         if (habit.id === habitId) {
             const newHistory = { ...habit.history, [dateKey]: 0 };
             return { ...habit, history: newHistory };
@@ -279,7 +279,7 @@ const HabitTrackerModule: React.FC<{ className?: string }> = ({ className = '' }
   };
 
   const handleDeleteHabit = (id: number) => setDeletingHabitId(id);
-  const confirmDeleteHabit = () => { if (deletingHabitId !== null) { setHabits(habits.filter(habit => habit.id !== deletingHabitId)); setDeletingHabitId(null); } };
+  const confirmDeleteHabit = () => { if (deletingHabitId !== null) { setHabits(habits.filter((habit: Habit) => habit.id !== deletingHabitId)); setDeletingHabitId(null); } };
   const cancelDeleteHabit = () => setDeletingHabitId(null);
   
   const toggleScheduleDay = (dayIndex: number) => {
@@ -299,7 +299,7 @@ const HabitTrackerModule: React.FC<{ className?: string }> = ({ className = '' }
   return (
     <Module title="Habit Tracker" icon={<RepeatIcon />} className={className}>
       <div className="space-y-4 max-h-[75vh] overflow-y-auto pr-2">
-        {habitsDueToday.length > 0 ? habitsDueToday.map(habit => (
+        {habitsDueToday.length > 0 ? habitsDueToday.map((habit: Habit) => (
             deletingHabitId === habit.id ? (
               <div key={habit.id} className="p-4 bg-red-500/10 rounded-lg flex items-center justify-between text-sm">
                 <span className="text-red-400 font-semibold">Delete this habit?</span>

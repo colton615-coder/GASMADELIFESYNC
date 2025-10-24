@@ -1,5 +1,5 @@
 import React, { useState, FormEvent } from 'react';
-import Module from './Module';
+import Module from '@/components/Module';
 import { 
     CalendarDaysIcon, 
     ChevronLeftIcon, 
@@ -8,7 +8,7 @@ import {
     TrashIcon,
     CheckIcon,
     XIcon
-} from './icons';
+} from '@/components/icons';
 import {
   format,
   startOfMonth,

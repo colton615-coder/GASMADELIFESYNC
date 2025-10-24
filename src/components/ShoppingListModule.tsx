@@ -1,9 +1,9 @@
 import React, { useState, FormEvent, useMemo, useEffect } from 'react';
-import Module from './Module';
-import { ShoppingCartIcon, PlusIcon, PencilIcon, TrashIcon, CheckIcon, XIcon } from './icons';
-import usePersistentState from '../hooks/usePersistentState';
-import AnimatedCheckbox from './AnimatedCheckbox';
-import { logToDailyLog } from '../services/logService';
+import Module from '@/components/Module';
+import { ShoppingCartIcon, PlusIcon, PencilIcon, TrashIcon, CheckIcon, XIcon } from '@/components/icons';
+import usePersistentState from '@/hooks/usePersistentState';
+import AnimatedCheckbox from '@/components/AnimatedCheckbox';
+import { logToDailyLog } from '@/services/logService';
 
 interface ShoppingItem {
   id: number;
@@ -32,9 +32,9 @@ const ShoppingListModule: React.FC<{ className?: string }> = ({ className = '' }
     const migrationKey = 'shoppingListMigrationV2_category';
     if (localStorage.getItem(migrationKey)) return;
 
-    const needsMigration = items.some(item => typeof item.category === 'undefined');
+    const needsMigration = items.some((item: ShoppingItem) => typeof item.category === 'undefined');
     if (needsMigration) {
-        const updatedItems = items.map(item => ({
+        const updatedItems = items.map((item: ShoppingItem) => ({
           ...item,
           category: (item as any).category !== undefined ? (item as any).category : null
         }));
@@ -58,7 +58,7 @@ const ShoppingListModule: React.FC<{ className?: string }> = ({ className = '' }
     };
   }, [newItemText, itemCategoryMap]);
 
-  const hasCompletedItems = useMemo(() => items.some(item => item.completed), [items]);
+  const hasCompletedItems = useMemo(() => items.some((item: ShoppingItem) => item.completed), [items]);
 
   const sortedItems = useMemo(() => [...items].sort((a, b) => {
     if (a.completed !== b.completed) {
@@ -114,12 +114,12 @@ const ShoppingListModule: React.FC<{ className?: string }> = ({ className = '' }
   };
 
   const toggleItemCompletion = (id: number) => {
-    const itemToToggle = items.find(item => item.id === id);
+    const itemToToggle = items.find((item: ShoppingItem) => item.id === id);
     if (itemToToggle && !itemToToggle.completed) {
         logToDailyLog('shopping_item_completed', { itemId: id, text: itemToToggle.text });
     }
     setItems(
-      items.map(item =>
+      items.map((item: ShoppingItem) =>
         item.id === id ? { ...item, completed: !item.completed } : item
       )
     );
@@ -145,7 +145,7 @@ const ShoppingListModule: React.FC<{ className?: string }> = ({ className = '' }
     }
     const trimmedCategory = editingItemCategory.trim();
     setItems(
-      items.map(item =>
+      items.map((item: ShoppingItem) =>
         item.id === editingItemId ? { ...item, text: trimmedText, category: trimmedCategory || null } : item
       )
     );
@@ -162,13 +162,13 @@ const ShoppingListModule: React.FC<{ className?: string }> = ({ className = '' }
 
   const confirmDeleteItem = () => {
     if (deletingItemId !== null) {
-      setItems(items.filter(item => item.id !== deletingItemId));
+      setItems(items.filter((item: ShoppingItem) => item.id !== deletingItemId));
       setDeletingItemId(null);
     }
   };
   
   const confirmClearCompleted = () => {
-    setItems(items.filter(item => !item.completed));
+    setItems(items.filter((item: ShoppingItem) => !item.completed));
     setIsClearingCompleted(false);
   };
 
@@ -197,7 +197,7 @@ const ShoppingListModule: React.FC<{ className?: string }> = ({ className = '' }
                     list="category-suggestions"
                 />
                  <datalist id="category-suggestions">
-                    {uniqueCategories.map(cat => <option key={cat} value={cat} />)}
+                    {uniqueCategories.map((cat: string) => <option key={cat} value={cat} />)}
                 </datalist>
             </div>
             <button
@@ -236,7 +236,7 @@ const ShoppingListModule: React.FC<{ className?: string }> = ({ className = '' }
                 <div key={category}>
                     <h3 className="text-caption font-semibold text-indigo-300 mb-2 border-b border-white/10 pb-2 capitalize">{category}</h3>
                     <ul className="space-y-2">
-                        {groupedItems[category].map(item => (
+                        {groupedItems[category].map((item: ShoppingItem) => (
                             <li
                                 key={item.id}
                                 className={`group flex items-center gap-4 p-2 rounded-md transition-all duration-300 ease-in-out ${

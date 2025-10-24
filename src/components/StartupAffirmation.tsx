@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import usePersistentState from '../hooks/usePersistentState';
+import usePersistentState from '@/hooks/usePersistentState';
 import { format } from 'date-fns';
-import { HeartIcon } from './icons';
-import { Affirmation } from './AffirmationFormModal';
-import { affirmations as defaultAffirmations } from '../services/affirmations';
+import { HeartIcon } from '@/components/icons';
+import { Affirmation } from '@/components/AffirmationFormModal';
+import { affirmations as defaultAffirmations } from '@/services/affirmations';
 
 interface DailyAffirmationLog {
   date: string;

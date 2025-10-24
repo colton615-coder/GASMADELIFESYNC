@@ -1,5 +1,5 @@
 import React from 'react';
-import { SparklesIcon } from './icons';
+import { SparklesIcon } from '@/components/icons';
 
 const ProactiveSuggestions: React.FC<{ setActiveModule: (module: string) => void }> = ({ setActiveModule }) => {
   const handleRequestAnalysis = () => {

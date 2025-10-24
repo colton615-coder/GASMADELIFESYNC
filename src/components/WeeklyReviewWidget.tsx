@@ -1,6 +1,6 @@
 import React from 'react';
 import { getDay } from 'date-fns';
-import { ClipboardCheckIcon } from './icons';
+import { ClipboardCheckIcon } from '@/components/icons';
 
 const WeeklyReviewWidget: React.FC<{
   setActiveModule: (module: string) => void;

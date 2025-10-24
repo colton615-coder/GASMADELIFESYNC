@@ -1,6 +1,6 @@
 import React from 'react';
-import Module from './Module';
-import { BrainCircuitIcon } from './icons';
+import Module from '@/components/Module';
+import { BrainCircuitIcon } from '@/components/icons';
 
 const MindfulMomentsWidget: React.FC<{
   setActiveModule: (module: string) => void;

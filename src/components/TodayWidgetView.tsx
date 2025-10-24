@@ -1,6 +1,6 @@
 import React from 'react';
-import usePersistentState from '../hooks/usePersistentState';
-import { TasksIcon, ChevronRightIcon } from './icons';
+import usePersistentState from '@/hooks/usePersistentState';
+import { TasksIcon, ChevronRightIcon } from '@/components/icons';
 
 interface Task {
   id: number;
@@ -12,11 +12,11 @@ const TodayWidgetView: React.FC<{ setActiveModule: (module: string) => void }> =
   const [tasks] = usePersistentState<Task[]>('tasks', []);
 
   const topTasks = tasks
-    .filter(task => !task.completed)
-    .sort((a, b) => b.id - a.id) // Newest first, assuming higher ID is newer
+    .filter((task: Task) => !task.completed)
+    .sort((a: Task, b: Task) => b.id - a.id) // Newest first, assuming higher ID is newer
     .slice(0, 3);
   
-  const pendingTasksCount = tasks.filter(task => !task.completed).length;
+  const pendingTasksCount = tasks.filter((task: Task) => !task.completed).length;
 
   return (
     <div 
@@ -37,7 +37,7 @@ const TodayWidgetView: React.FC<{ setActiveModule: (module: string) => void }> =
         </div>
         {topTasks.length > 0 ? (
           <ul className="space-y-4">
-            {topTasks.map(task => (
+            {topTasks.map((task: Task) => (
               <li key={task.id} className="flex items-center gap-4 bg-white/5 p-4 rounded-lg transition-colors hover:bg-white/10">
                 <div className="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0"></div>
                 <span className="text-body truncate">{task.text}</span>

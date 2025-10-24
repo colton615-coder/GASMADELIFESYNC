@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { authenticate } from '../services/biometricService';
-import usePersistentState from '../hooks/usePersistentState';
-import { ShieldIcon } from './icons';
+import { authenticate } from '@/services/biometricService';
+import usePersistentState from '@/hooks/usePersistentState';
+import { ShieldIcon } from '@/components/icons';
 
 interface BiometricLockScreenProps {
   onUnlock: () => void;

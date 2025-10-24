@@ -1,6 +1,6 @@
 import React from 'react';
-import Module from './Module';
-import { BoltIcon, PlusCircleIcon, UploadIcon, MessageSquareIcon } from './icons';
+import Module from '@/components/Module';
+import { BoltIcon, PlusCircleIcon, UploadIcon, MessageSquareIcon } from '@/components/icons';
 
 const QuickActionButton: React.FC<{ icon: React.ReactNode; label: string }> = ({ icon, label }) => (
   <button className="flex flex-col items-center justify-center gap-2 p-4 bg-white/5 rounded-lg w-full text-center transition-all duration-200 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400 active:scale-95">

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import Module from './Module';
-import { SettingsIcon, ShieldIcon, SunIcon } from './icons';
-import usePersistentState from '../hooks/usePersistentState';
-import { isBiometricSupported, registerCredential } from '../services/biometricService';
+import Module from '@/components/Module';
+import { SettingsIcon, ShieldIcon, SunIcon } from '@/components/icons';
+import usePersistentState from '@/hooks/usePersistentState';
+import { isBiometricSupported, registerCredential } from '@/services/biometricService';
 
 interface BiometricSettings {
     isEnabled: boolean;

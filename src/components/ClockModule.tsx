@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import Module from './Module';
-import { ClockIcon } from './icons';
+import Module from '@/components/Module';
+import { ClockIcon } from '@/components/icons';
 
 const ClockModule: React.FC = () => {
   const [time, setTime] = useState(new Date());

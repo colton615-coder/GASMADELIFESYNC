@@ -1,13 +1,13 @@
 import React, { useState, FormEvent, useEffect, useMemo } from 'react';
-import Module from './Module';
-import { TasksIcon, PlusIcon, PencilIcon, TrashIcon, CheckIcon, XIcon, CalendarIcon } from './icons';
-import usePersistentState from '../hooks/usePersistentState';
-import WheelPicker from './WheelPicker';
+import Module from '@/components/Module';
+import { TasksIcon, PlusIcon, PencilIcon, TrashIcon, CheckIcon, XIcon, CalendarIcon } from '@/components/icons';
+import usePersistentState from '@/hooks/usePersistentState';
+import WheelPicker from '@/components/WheelPicker';
 import { format, parseISO, getDaysInMonth, isValid } from 'date-fns';
-import AnimatedCheckbox from './AnimatedCheckbox';
-import BottomSheet from './BottomSheet';
+import AnimatedCheckbox from '@/components/AnimatedCheckbox';
+import BottomSheet from '@/components/BottomSheet';
 import toast from 'react-hot-toast';
-import { logToDailyLog } from '../services/logService';
+import { logToDailyLog } from '@/services/logService';
 
 type Priority = 'None' | 'Low' | 'Medium' | 'High';
 type SortOption = 'creationDate' | 'dueDate' | 'priority';
@@ -67,10 +67,10 @@ const TasksModule: React.FC<{ className?: string }> = ({ className = '' }) => {
     const migrationKey = 'tasksMigrationV3_dueDatePriority';
     if (localStorage.getItem(migrationKey)) return;
 
-    const needsMigration = tasks.some(task => typeof task.dueDate === 'undefined' || typeof task.priority === 'undefined');
+    const needsMigration = tasks.some((task: Task) => typeof task.dueDate === 'undefined' || typeof task.priority === 'undefined');
     
     if (needsMigration) {
-        const updatedTasks = tasks.map(task => {
+        const updatedTasks = tasks.map((task: Task) => {
             const migratedTask: Task = { ...task };
             if (typeof task.dueDate === 'undefined') {
                 migratedTask.dueDate = null;
@@ -150,7 +150,7 @@ const TasksModule: React.FC<{ className?: string }> = ({ className = '' }) => {
   };
 
   const toggleTaskCompletion = (id: number) => {
-    const taskToToggle = tasks.find(t => t.id === id);
+    const taskToToggle = tasks.find((t: Task) => t.id === id);
     if (taskToToggle && !taskToToggle.completed) {
         setJustCompletedTaskId(id);
         toast.success("Task completed! 🎉");
@@ -159,7 +159,7 @@ const TasksModule: React.FC<{ className?: string }> = ({ className = '' }) => {
     }
 
     setTasks(
-      tasks.map(task =>
+      tasks.map((task: Task) =>
         task.id === id 
           ? { ...task, 
               completed: !task.completed,
@@ -191,7 +191,7 @@ const TasksModule: React.FC<{ className?: string }> = ({ className = '' }) => {
         handleDeleteItem(editingTaskId);
     } else {
         setTasks(
-          tasks.map(task =>
+          tasks.map((task: Task) =>
             task.id === editingTaskId ? { 
                 ...task, 
                 text: editingTaskText.trim(),
@@ -210,7 +210,7 @@ const TasksModule: React.FC<{ className?: string }> = ({ className = '' }) => {
   
   const confirmDeleteItem = () => {
     if (deletingTaskId !== null) {
-      setTasks(tasks.filter(task => task.id !== deletingTaskId));
+      setTasks(tasks.filter((task: Task) => task.id !== deletingTaskId));
       setDeletingTaskId(null);
     }
   };
@@ -281,7 +281,7 @@ const TasksModule: React.FC<{ className?: string }> = ({ className = '' }) => {
 
           <ul className="space-y-2 overflow-y-auto max-h-72 pr-2">
             {sortedTasks.length > 0 ? (
-              sortedTasks.map(task => (
+              sortedTasks.map((task: Task) => (
                 <li
                   key={task.id}
                   className={`group flex items-start gap-4 p-4 rounded-md transition-all duration-300 ease-in-out 

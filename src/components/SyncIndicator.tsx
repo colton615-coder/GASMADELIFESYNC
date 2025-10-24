@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import usePersistentState from '../hooks/usePersistentState';
+import usePersistentState from '@/hooks/usePersistentState';
 import { formatDistanceToNow } from 'date-fns';
-import { RefreshCwIcon, LoaderIcon } from './icons';
+import { RefreshCwIcon, LoaderIcon } from '@/components/icons';
 
 const SyncIndicator: React.FC = () => {
     const [lastSyncTime, setLastSyncTime] = usePersistentState<string>('lastSyncTime', () => new Date().toISOString());

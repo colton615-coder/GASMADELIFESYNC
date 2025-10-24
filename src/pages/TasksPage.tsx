@@ -1,5 +1,5 @@
 import React from 'react';
-import TasksModule from '../components/TasksModule';
+import TasksModule from '@/components/TasksModule';
 
 const TasksPage: React.FC = () => {
     return <TasksModule />;
