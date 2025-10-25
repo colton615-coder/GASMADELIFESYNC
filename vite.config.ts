@@ -9,9 +9,9 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     resolve: {
-      alias: [
-        { find: '@', replacement: path.resolve(__dirname, 'src') }
-      ]
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
     },
     define: {
       // Expose environment variables to the client

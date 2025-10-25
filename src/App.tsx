@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import StartupAffirmation from '@/components/StartupAffirmation';
 import NavigationBar from '@/components/NavigationBar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { CommandBar } from '@/components/CommandBar';
 
 // Lazy-loaded components
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
@@ -43,6 +44,7 @@ const App: React.FC = () => {
     <Router>
       <div className="flex h-screen w-full bg-slate-950 text-white">
         <Toaster position="bottom-center" />
+        <CommandBar />
         {!isStartupAnimationDone && (
           <StartupAffirmation
             onAnimationComplete={() => setIsStartupAnimationDone(true)}
