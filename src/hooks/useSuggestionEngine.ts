@@ -96,10 +96,10 @@ export function useSuggestionEngine() {
           const until = snoozed[id];
           return until && until > Date.now();
         }
-  // Snooze suggestion by id for N minutes
-  const snoozeSuggestion = (id: string, minutes: number = 60) => {
-    setSnoozed({ ...snoozed, [id]: Date.now() + minutes * 60 * 1000 });
-  };
+        // Snooze suggestion by id for N minutes
+        const snoozeSuggestion = (id: string, minutes: number = 60) => {
+          setSnoozed({ ...snoozed, [id]: Date.now() + minutes * 60 * 1000 });
+        };
 
         // Task-based suggestion: urgent or overdue tasks
         const now = new Date();
@@ -145,20 +145,31 @@ export function useSuggestionEngine() {
         }
 
         if (mounted) setSuggestions(built);
-  // Dismiss suggestion by id
-  const dismissSuggestion = (id: string) => {
-    setDismissed([...dismissed, id]);
-  };
+        // Dismiss suggestion by id
+        const dismissSuggestion = (id: string) => {
+          setDismissed([...dismissed, id]);
+        };
 
-  return useMemo(() => ({ suggestions, dismissSuggestion, snoozeSuggestion }), [suggestions, dismissSuggestion, snoozeSuggestion]);
+        // Return all suggestion actions
+        return { suggestions: built, dismissSuggestion, snoozeSuggestion };
       } catch (err) {
         // Silently fail and leave suggestions empty
         console.error('Suggestion engine error:', err);
+        return { suggestions: [], dismissSuggestion: () => {}, snoozeSuggestion: () => {} };
       }
     }
 
-    build();
-    const id = setInterval(build, 1000 * 60 * 5); // refresh every 5 minutes
+    const result = build();
+    if (result && mounted) {
+      // Only set suggestions if build succeeded
+      setSuggestions(result.suggestions);
+    }
+    const id = setInterval(() => {
+      const result = build();
+      if (result && mounted) {
+        setSuggestions(result.suggestions);
+      }
+    }, 1000 * 60 * 5); // refresh every 5 minutes
 
     return () => {
       mounted = false;
@@ -166,7 +177,14 @@ export function useSuggestionEngine() {
     };
   }, []);
 
-  return useMemo(() => ({ suggestions }), [suggestions]);
+  // Always return suggestion actions
+  const snoozeSuggestion = (id: string, minutes: number = 60) => {
+    setSnoozed({ ...snoozed, [id]: Date.now() + minutes * 60 * 1000 });
+  };
+  const dismissSuggestion = (id: string) => {
+    setDismissed([...dismissed, id]);
+  };
+  return { suggestions, dismissSuggestion, snoozeSuggestion };
 }
 
 export default useSuggestionEngine;

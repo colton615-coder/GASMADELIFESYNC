@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Module from '@/components/Module';
 import { DatabaseIcon, DownloadIcon } from '@/components/icons';
+import { motion } from 'framer-motion';
 
 // Data keys are now sourced from the central store for consistency.
 const DATA_KEYS = [
@@ -80,20 +81,38 @@ const DataManagementModule: React.FC<{ className?: string }> = ({ className = ''
 
     return (
         <Module title="Data Management" icon={<DatabaseIcon />} className={className}>
-            <div className="flex flex-col items-center justify-center p-4">
+            <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                className="flex flex-col items-center justify-center p-4"
+                aria-label="Data management module"
+                tabIndex={0}
+                role="region"
+            >
                 <p className="text-gray-400 text-center mb-4">
                     Download a complete backup of all your application data. The download will continue in the background.
                 </p>
-                <button
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={handleExportData}
                     disabled={isExporting}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition disabled:bg-gray-500"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 transition disabled:bg-gray-500"
+                    aria-label="Export all data"
                 >
                     <DownloadIcon className="w-5 h-5" />
                     {isExporting ? 'Preparing...' : 'Export All Data'}
-                </button>
-                {statusMessage && <p className="text-caption mt-4 h-4">{statusMessage}</p>}
-            </div>
+                </motion.button>
+                {statusMessage && <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="text-caption mt-4 h-4"
+                    aria-live="polite"
+                >{statusMessage}</motion.p>}
+            </motion.div>
         </Module>
     );
 };

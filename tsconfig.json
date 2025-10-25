@@ -28,6 +28,11 @@
       ]
     }
   },
-  "include": ["src"],
+  "include": [
+    "src",
+    "src/components",
+    "src/components/**/*.ts",
+    "src/components/**/*.tsx"
+  ],
   "exclude": ["node_modules"]
 }

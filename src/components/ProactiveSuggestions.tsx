@@ -1,10 +1,12 @@
-import React from 'react';
-import useSuggestionEngine, { Suggestion } from '@/hooks/useSuggestionEngine';
+import React, { useMemo } from 'react';
+import { useSuggestionEngine, Suggestion } from '@/hooks/useSuggestionEngine';
 import { useNavigate } from 'react-router-dom';
 
-export default function ProactiveSuggestions({ setActiveModule }: { setActiveModule?: (m: string) => void }) {
+const ProactiveSuggestions: React.FC<{ setActiveModule?: (m: string) => void }> = ({ setActiveModule }) => {
   const { suggestions, dismissSuggestion, snoozeSuggestion } = useSuggestionEngine();
   const navigate = useNavigate();
+
+  const memoizedSuggestionEngine = useMemo(() => ({ suggestions, dismissSuggestion, snoozeSuggestion }), [suggestions, dismissSuggestion, snoozeSuggestion]);
 
   if (!suggestions || suggestions.length === 0) {
     return null; // render nothing when there are no suggestions
@@ -60,27 +62,6 @@ export default function ProactiveSuggestions({ setActiveModule }: { setActiveMod
         </div>
       ))}
     </div>
-  );
-}
-import React from 'react';
-import { SparklesIcon } from '@/components/icons';
-
-const ProactiveSuggestions: React.FC<{ setActiveModule: (module: string) => void }> = ({ setActiveModule }) => {
-  const handleRequestAnalysis = () => {
-    // This functionality will be expanded later. For now, it logs the action.
-    console.log('User requested analysis.');
-    // A potential future action could be: setActiveModule('WEEKLY_REVIEW');
-  };
-
-  return (
-    <button
-      onClick={handleRequestAnalysis}
-      className="w-full flex items-center justify-center gap-4 p-6 bg-white/5 rounded-2xl border border-indigo-500/30 hover:bg-white/10 transition-colors group"
-      aria-label="Get Your Weekly Insight"
-    >
-      <SparklesIcon className="w-6 h-6 text-indigo-300 transition-transform group-hover:scale-110" />
-      <span className="text-body-emphasis font-semibold text-indigo-200">Get Your Weekly Insight</span>
-    </button>
   );
 };
 
