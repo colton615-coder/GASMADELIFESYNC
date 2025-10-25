@@ -32,16 +32,17 @@ const NavButton: React.FC<NavButtonProps> = memo(({ icon, label, moduleId, isAct
         <button 
             onClick={handleClick} 
             onAnimationEnd={() => setIsAnimating(false)}
-            className={`flex flex-col items-center justify-center gap-2 w-20 h-16 rounded-lg flex-shrink-0 active:scale-95 ${
+            className={`flex flex-col items-center justify-center gap-2 w-20 h-16 rounded-xl flex-shrink-0 active:scale-95 transition-all duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 font-semibold text-sm tracking-tight ${
                 isActive 
-                ? 'text-indigo-400 bg-indigo-500/10' 
+                ? 'text-indigo-400 bg-indigo-500/10 shadow-lg' 
                 : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
             } ${isAnimating ? 'nav-icon-pop-animation' : ''}`}
             aria-current={isActive ? 'page' : undefined}
             aria-label={label}
+            tabIndex={0}
         >
-            <div className="w-6 h-6">{icon}</div>
-            <span className="text-xs font-medium">{label}</span>
+            <div className="w-7 h-7 flex items-center justify-center">{icon}</div>
+            <span className="text-xs font-semibold mt-1">{label}</span>
         </button>
     );
 });
@@ -70,9 +71,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeModule, setActiveMo
     }, [setActiveModule]);
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 h-20 bg-[#121212]/50 backdrop-blur-lg border-t border-white/10 z-50">
-            <div className="flex items-center justify-start sm:justify-center h-full px-2 overflow-x-auto overflow-y-hidden">
-                <div className="flex items-center gap-2">
+    <nav className="fixed bottom-0 left-0 right-0 h-20 bg-[var(--color-background-main)]/60 backdrop-blur-lg border-t border-white/10 z-50 shadow-2xl" role="navigation" aria-label="Main navigation">
+            <div className="flex items-center justify-start sm:justify-center h-full px-4 overflow-x-auto overflow-y-hidden">
+                <div className="flex items-center gap-3">
                     {navItems.map(item => (
                         <NavButton
                             key={item.id}

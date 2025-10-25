@@ -61,8 +61,8 @@ const StartupAffirmation: React.FC<{ onAnimationComplete: () => void; activeModu
     }
   }, [activeModule]);
 
-  const splashStyles = "fixed inset-0 bg-slate-950 flex-col text-center p-8 text-3xl sm:text-4xl lg:text-5xl";
-  const bannerStyles = "fixed top-0 left-0 right-0 h-16 bg-slate-900/50 backdrop-blur-sm flex-row text-center px-4 text-base sm:text-lg";
+  const splashStyles = "fixed inset-0 bg-[var(--color-background-main)] flex-col text-center p-8 text-3xl sm:text-4xl lg:text-5xl";
+  const bannerStyles = "fixed top-0 left-0 right-0 h-16 bg-[var(--color-background-main)]/50 backdrop-blur-sm flex-row text-center px-4 text-base sm:text-lg";
   const hiddenStyles = "opacity-0 -translate-y-full";
 
   const getModeStyles = () => {

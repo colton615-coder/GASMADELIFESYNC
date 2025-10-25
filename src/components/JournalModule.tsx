@@ -132,23 +132,23 @@ const FocusMode: React.FC<{
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-950 z-50 flex flex-col p-4 sm:p-6 lg:p-8 animate-fade-in">
+    <div className="fixed inset-0 bg-slate-950 z-50 flex flex-col p-6 md:p-10 lg:p-16 animate-fade-in">
         <style>{`.animate-fade-in { animation: fadeIn 0.3s ease-in-out; } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`}</style>
-      <div className="flex-shrink-0 w-full max-w-4xl mx-auto flex justify-end items-center">
+      <div className="flex-shrink-0 w-full max-w-4xl mx-auto flex justify-end items-center mb-6">
         <button 
           onClick={handleSaveAndClose}
-          className="px-4 py-2 text-sm rounded-md bg-indigo-600 hover:bg-indigo-700 font-semibold transition text-white"
+          className="px-6 py-3 text-base rounded-lg bg-indigo-600 hover:bg-indigo-700 font-bold transition text-white shadow-lg"
         >
           Save & Close
         </button>
       </div>
       <div className="flex-grow w-full max-w-3xl mx-auto mt-6 overflow-y-auto">
-        <h2 className="text-2xl sm:text-3xl font-semibold text-gray-300 mb-6 font-serif">{prompt}</h2>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-8 font-serif tracking-tight">{prompt}</h2>
         <RichTextEditor 
             value={text} 
             onChange={setText} 
             placeholder="Your thoughts..."
-            className="text-lg sm:text-xl leading-relaxed font-serif !min-h-[50vh] !bg-transparent !p-0 !ring-0"
+            className="text-xl md:text-2xl leading-relaxed font-serif !min-h-[50vh] !bg-transparent !p-0 !ring-0"
             toolbarClassName="bg-slate-900"
             ariaLabel={`Journal entry for prompt: ${prompt}`}
         />
@@ -536,7 +536,7 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
     }, [tasks, todayKey]);
 
     return (
-        <div className="space-y-6">
+  <div className="space-y-8">
             {/* Mood Tracker */}
             <div>
               <h3 className="text-body-emphasis text-gray-200 mb-2">How are you feeling?</h3>
@@ -690,7 +690,7 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
             </div>
 
             {archiveTab === 'entries' && (
-                <div className="space-y-4 max-h-[75vh] overflow-y-auto pr-2">
+                <div className="space-y-6 max-h-[75vh] overflow-y-auto pr-2">
                     {filteredEntries.length > 0 ? (
                         // FIX: Add explicit types for map arguments to correctly type 'entry' as JournalEntry.
                         filteredEntries.map(([date, entry]: [string, JournalEntry]) => {
@@ -699,7 +699,7 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
                             const analysis = analysisCache[date];
 
                             return (
-                                <div key={date} className="bg-white/5 p-4 rounded-lg group transition-all">
+                                <div key={date} className="bg-white/5 p-6 rounded-2xl group transition-all shadow-md">
                                     {editingEntryKey === date ? (
                                         <div className="flex flex-col gap-4">
                                             <p className="text-caption font-semibold text-indigo-300">Editing - {format(parseISO(date), 'MMMM d, yyyy')}</p>
@@ -708,13 +708,13 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
                                         </div>
                                     ) : (
                                         <>
-                                            <div className="flex justify-between items-start">
+                                            <div className="flex justify-between items-start gap-6">
                                                 <div>
-                                                    <p className="text-caption font-semibold text-indigo-300 mb-2 flex items-center gap-2">
+                                                    <p className="text-caption font-semibold text-indigo-300 mb-2 flex items-center gap-2 text-lg">
                                                         {format(parseISO(date), 'MMMM d, yyyy')}
                                                         {moodEmoji && <span className="text-lg" title={`Mood: ${moodLog?.mood}`}>{moodEmoji}</span>}
                                                     </p>
-                                                    <p className="text-caption italic mb-4">"{entry.promptText}"</p>
+                                                    <p className="text-caption italic mb-4 text-base">"{entry.promptText}"</p>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     {isAnalyzing[date] && <LoaderIcon className="w-4 h-4"/>}
@@ -722,7 +722,7 @@ Here is the data:\n${monthEntries.join('\n---\n')}`;
                                                 </div>
                                             </div>
                                             {moodLog?.note && <p className="text-xs text-gray-400 mb-4 border-l-2 border-white/10 pl-2">Feeling {moodLog.mood} because: "{moodLog.note}"</p>}
-                                            <div className="text-body prose prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-0 line-clamp-4" dangerouslySetInnerHTML={{ __html: entry.entryText }}/>
+                                            <div className="text-body prose prose-invert max-w-none prose-p:my-3 prose-ul:my-2 prose-li:my-0 line-clamp-4 text-lg" dangerouslySetInnerHTML={{ __html: entry.entryText }}/>
                                             {analysis && (analysis as JournalAnalysis).tags.length > 0 && (
                                                 <div className="mt-4 flex flex-wrap gap-2">
                                                     {(analysis as JournalAnalysis).tags.map(tag => (

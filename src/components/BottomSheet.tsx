@@ -56,44 +56,47 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         handleClose();
-        return;
-      }
-      
-      if (event.key === 'Tab') {
-          if (event.shiftKey) { // Shift+Tab
-              if (document.activeElement === firstElement) {
-                  lastElement?.focus();
-                  event.preventDefault();
-              }
-          } else { // Tab
-              if (document.activeElement === lastElement) {
-                  firstElement?.focus();
-                  event.preventDefault();
-              }
-          }
-      }
-    };
-    
-    sheet.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      sheet.removeEventListener('keydown', handleKeyDown);
-      // Restore focus to the element that was focused before the modal opened
-      previouslyFocusedElement?.focus();
-    };
-  }, [isOpen, handleClose]);
-  
-  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-      dragStartY.current = e.targetTouches[0].clientY;
-      if (sheetRef.current) {
-          sheetRef.current.style.transition = 'none';
-      }
-  };
-  
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-      if (dragStartY.current === null) return;
-      
-      const deltaY = e.targetTouches[0].clientY - dragStartY.current;
+        return rootElement
+          ? createPortal(
+              <div
+                ref={sheetRef}
+                className={`fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm ${isOpen ? 'animate-in' : ''} ${isAnimatingOut ? 'animate-out' : ''}`}
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                aria-label={title}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseMove={handleMouseMove}
+              >
+                <div
+                  className="w-full max-w-lg bg-surface-module rounded-t-2xl shadow-2xl p-6 relative"
+                  role="document"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-white">{title}</h2>
+                    <button onClick={handleClose} className="p-2 rounded-full text-gray-400 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400" aria-label="Close sheet">
+                      <span className="sr-only">Close</span>
+                      <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </div>
+                  {children}
+                  <div className="mt-6 flex gap-2 justify-end">
+                    {secondaryAction && (
+                      <button onClick={secondaryAction.onClick} disabled={secondaryAction.disabled} className={`px-4 py-2 rounded-md font-semibold ${secondaryAction.variant === 'primary' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-white/10 text-indigo-300 hover:bg-white/20'} transition-colors`} aria-label={secondaryAction.label}>{secondaryAction.label}</button>
+                    )}
+                    {primaryAction && (
+                      <button onClick={primaryAction.onClick} disabled={primaryAction.disabled} className={`px-4 py-2 rounded-md font-semibold ${primaryAction.variant === 'primary' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-white/10 text-indigo-300 hover:bg-white/20'} transition-colors`} aria-label={primaryAction.label}>{primaryAction.label}</button>
+                    )}
+                  </div>
+                </div>
+              </div>,
+              rootElement
+            )
+          : null;
       currentY.current = Math.max(0, deltaY); // Only allow dragging down
       
       if (sheetRef.current) {

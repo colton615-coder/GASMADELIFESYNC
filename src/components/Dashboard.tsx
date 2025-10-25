@@ -1,11 +1,12 @@
 import React from 'react';
-import DashboardStatsWidget from '@/components/DashboardStatsWidget';
-import DataManagementModule from '@/components/DataManagementModule';
-import TodayWidgetView from '@/components/TodayWidgetView';
-import ProactiveSuggestions from '@/components/ProactiveSuggestions';
-import JournalInsightWidget from '@/components/JournalInsightWidget';
-import MindfulMomentsWidget from '@/components/MindfulMomentsWidget';
-import WeeklyReviewWidget from '@/components/WeeklyReviewWidget';
+import React, { Suspense, lazy } from 'react';
+const DashboardStatsWidget = lazy(() => import('@/components/DashboardStatsWidget'));
+const DataManagementModule = lazy(() => import('@/components/DataManagementModule'));
+const TodayWidgetView = lazy(() => import('@/components/TodayWidgetView'));
+const ProactiveSuggestions = lazy(() => import('@/components/ProactiveSuggestions'));
+const JournalInsightWidget = lazy(() => import('@/components/JournalInsightWidget'));
+const MindfulMomentsWidget = lazy(() => import('@/components/MindfulMomentsWidget'));
+const WeeklyReviewWidget = lazy(() => import('@/components/WeeklyReviewWidget'));
 import { motion } from 'framer-motion';
 
 const Dashboard: React.FC<{ 
@@ -30,43 +31,57 @@ const Dashboard: React.FC<{
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -24 }}
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-      className="flex flex-col gap-6"
+      className="flex flex-col gap-8 px-4 md:px-8 lg:px-16 py-8 w-full max-w-7xl mx-auto"
       aria-label="Dashboard"
     >
       <motion.h2
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 30 }}
-        className="text-module-header"
+        className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-4"
       >
         {greeting}
       </motion.h2>
 
-      <motion.div layout>
-        <ProactiveSuggestions setActiveModule={setActiveModule} />
-      </motion.div>
-
-      <motion.div layout>
-        <WeeklyReviewWidget setActiveModule={setActiveModule} />
-      </motion.div>
-
-      <motion.div layout>
-        <TodayWidgetView setActiveModule={setActiveModule} />
-      </motion.div>
-
-      <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <motion.div layout className="lg:col-span-2">
-           <JournalInsightWidget setActiveModule={setActiveModule} setJournalLink={setJournalLink} /> 
+      <Suspense fallback={<div className="mb-6">Loading suggestions...</div>}>
+        <motion.div layout className="mb-6">
+          <ProactiveSuggestions setActiveModule={setActiveModule} />
         </motion.div>
-        <motion.div layout>
-          <MindfulMomentsWidget setActiveModule={setActiveModule} />
+      </Suspense>
+
+      <Suspense fallback={<div className="mb-6">Loading weekly review...</div>}>
+        <motion.div layout className="mb-6">
+          <WeeklyReviewWidget setActiveModule={setActiveModule} />
         </motion.div>
-        <motion.div layout className="lg:col-span-3">
+      </Suspense>
+
+      <Suspense fallback={<div className="mb-6">Loading today widget...</div>}>
+        <motion.div layout className="mb-6">
+          <TodayWidgetView setActiveModule={setActiveModule} />
+        </motion.div>
+      </Suspense>
+
+      <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <Suspense fallback={<div>Loading journal insight...</div>}>
+          <motion.div layout className="lg:col-span-2">
+            <JournalInsightWidget setActiveModule={setActiveModule} setJournalLink={setJournalLink} /> 
+          </motion.div>
+        </Suspense>
+        <Suspense fallback={<div>Loading mindful moments...</div>}>
+          <motion.div layout>
+            <MindfulMomentsWidget setActiveModule={setActiveModule} />
+          </motion.div>
+        </Suspense>
+        <Suspense fallback={<div>Loading stats...</div>}>
+          <motion.div layout className="lg:col-span-3">
             <DashboardStatsWidget setActiveModule={setActiveModule} />
-        </motion.div>
-        <motion.div layout className="lg:col-span-3">
+          </motion.div>
+        </Suspense>
+        <Suspense fallback={<div>Loading data management...</div>}>
+          <motion.div layout className="lg:col-span-3">
             <DataManagementModule />
-        </motion.div>
+          </motion.div>
+        </Suspense>
       </motion.div>
     </motion.div>
   );

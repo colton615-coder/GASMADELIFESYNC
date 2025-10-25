@@ -23,8 +23,9 @@ const TodayWidgetView: React.FC<{ setActiveModule: (module: string) => void }> =
     <motion.div
       onClick={() => setActiveModule('TASKS')}
       style={{
-        backgroundColor: '#252525',
-        boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.07)'
+        backgroundColor: 'var(--color-surface-module)',
+        boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.07)',
+        transition: 'background-color 0.5s ease'
       }}
       className="border border-white/10 rounded-2xl p-6 flex flex-col justify-between h-full cursor-pointer transition-all duration-300 ease-in-out hover:border-indigo-400/50 hover:-translate-y-1 group"
       initial={{ opacity: 0, y: 16 }}

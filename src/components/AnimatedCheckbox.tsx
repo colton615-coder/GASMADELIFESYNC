@@ -43,11 +43,12 @@ const AnimatedCheckbox: React.FC<AnimatedCheckboxProps> = ({ checked, onChange, 
 
   return (
     <div 
-      className={`relative flex items-center justify-center h-6 w-6 flex-shrink-0 ${disabledClass} ${className}`}
+      className={`relative flex items-center justify-center h-6 w-6 flex-shrink-0 ${disabledClass} ${className} focus-visible:ring-2 focus-visible:ring-indigo-400 outline-none`}
       onClick={handleClick}
       role="checkbox"
       aria-checked={checked}
       aria-disabled={disabled}
+      aria-label={checked ? 'Checked' : 'Unchecked'}
       tabIndex={disabled ? -1 : 0}
       onKeyDown={handleKeyDown}
     >

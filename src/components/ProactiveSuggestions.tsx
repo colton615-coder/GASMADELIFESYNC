@@ -15,7 +15,7 @@ const ProactiveSuggestions: React.FC<{ setActiveModule?: (m: string) => void }> 
   return (
     <div className="p-4 space-y-3">
       {suggestions.map((s: Suggestion) => (
-        <div key={s.id} className="bg-slate-900/60 border border-slate-800 rounded-lg p-3">
+  <div key={s.id} className="bg-[var(--color-surface-module)]/60 border border-white/10 rounded-lg p-3 transition-all duration-300 ease-in-out">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h3 className="text-sm font-semibold text-white">{s.title}</h3>

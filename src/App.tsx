@@ -42,7 +42,7 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <div className="flex h-screen w-full bg-slate-950 text-white">
+  <div className="flex min-h-screen w-full bg-[var(--color-background-main)] text-white">
         <Toaster position="bottom-center" />
         <CommandBar />
         {!isStartupAnimationDone && (

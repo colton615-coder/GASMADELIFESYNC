@@ -68,7 +68,7 @@ const FocusBlock: React.FC<{ setActiveModule: (module: string) => void }> = ({ s
 
     return (
         <div 
-            style={{ backgroundColor: '#252525', boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.07)' }}
+            style={{ backgroundColor: 'var(--color-surface-module)', boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.07)', transition: 'background-color 0.5s ease' }}
             className="border border-indigo-500/30 rounded-2xl p-4"
         >
             <h2 className="text-module-header mb-4 px-2">Today's Focus</h2>
