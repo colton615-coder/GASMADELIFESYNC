@@ -1,4 +1,3 @@
-import React from 'react';
 import React, { Suspense, lazy } from 'react';
 const DashboardStatsWidget = lazy(() => import('@/components/DashboardStatsWidget'));
 const DataManagementModule = lazy(() => import('@/components/DataManagementModule'));
@@ -8,7 +7,6 @@ const JournalInsightWidget = lazy(() => import('@/components/JournalInsightWidge
 const MindfulMomentsWidget = lazy(() => import('@/components/MindfulMomentsWidget'));
 const WeeklyReviewWidget = lazy(() => import('@/components/WeeklyReviewWidget'));
 import { motion } from 'framer-motion';
-
 const Dashboard: React.FC<{ 
   setActiveModule: (module: string) => void;
   setJournalLink: (dateKey: string | null) => void;
@@ -21,10 +19,8 @@ const Dashboard: React.FC<{
     return 'Good evening';
   };
 
-  // In a real app, this would come from user settings or context.
-  // Removed hard-coded/mock profile name for privacy.
-  const userName = "";
-  const greeting = userName ? `${getGreeting()}, ${userName}.` : `${getGreeting()}.`;
+  // No user profile needed; always show generic greeting.
+  const greeting = `${getGreeting()}.`;
 
   return (
     <motion.div
