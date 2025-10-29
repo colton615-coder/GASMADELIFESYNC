@@ -22,7 +22,8 @@ const Dashboard: React.FC<{
   };
 
   // In a real app, this would come from user settings or context.
-  const userName = "Alex"; 
+  // Removed hard-coded/mock profile name for privacy.
+  const userName = "";
   const greeting = userName ? `${getGreeting()}, ${userName}.` : `${getGreeting()}.`;
 
   return (
