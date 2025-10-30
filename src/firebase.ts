@@ -5,7 +5,7 @@ import { getFirestore, Firestore } from "firebase/firestore";
 // It is generally recommended to use environment variables for security,
 // but these have been hardcoded as per your request.
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_API_KEY,
+  apiKey: "AIzaSyC8Hk-CbMVdV1eU2ixaFf2v4uZWWH3iIzz8",
   authDomain: "sf2025-be6b2.firebaseapp.com",
   projectId: "sf2025-be6b2",
   storageBucket: "sf2025-be6b2.appspot.com",
