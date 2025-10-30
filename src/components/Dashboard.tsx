@@ -14,12 +14,11 @@ const Dashboard: React.FC<{
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return 'Good morning, Colton';
+    if (hour < 18) return 'Good afternoon, Colton';
+    return 'Good evening, Colton';
   };
 
-  // No user profile needed; always show generic greeting.
   const greeting = `${getGreeting()}.`;
 
   return (
