@@ -1,4 +1,5 @@
 import React, { memo, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
     HomeIcon, 
     TasksIcon, 
@@ -12,21 +13,24 @@ import {
     ClipboardCheckIcon
 } from '@/components/icons';
 
-interface NavButtonProps {
+type NavButtonProps = {
     icon: React.ReactNode;
     label: string;
     moduleId: string;
     isActive: boolean;
     onClick: (moduleId: string) => void;
-}
+    route: string;
+};
 
-const NavButton: React.FC<NavButtonProps> = memo(({ icon, label, moduleId, isActive, onClick }) => {
+const NavButton: React.FC<NavButtonProps> = memo(({ icon, label, moduleId, isActive, onClick, route }) => {
     const [isAnimating, setIsAnimating] = useState(false);
+    const navigate = useNavigate();
 
     const handleClick = useCallback(() => {
         onClick(moduleId);
         setIsAnimating(true);
-    }, [onClick, moduleId]);
+        navigate(route);
+    }, [onClick, moduleId, route, navigate]);
 
     return (
         <button 
@@ -54,16 +58,16 @@ interface NavigationBarProps {
 
 const NavigationBar: React.FC<NavigationBarProps> = ({ activeModule, setActiveModule }) => {
     const navItems = [
-        { id: 'DASHBOARD', label: 'Dashboard', icon: <HomeIcon /> },
-        { id: 'CALENDAR', label: 'Calendar', icon: <CalendarDaysIcon /> },
-        { id: 'TASKS', label: 'Tasks', icon: <TasksIcon /> },
-        { id: 'HABITS', label: 'Habits', icon: <RepeatIcon /> },
-        { id: 'SHOPPING', label: 'Shopping', icon: <ShoppingCartIcon /> },
-        { id: 'WORKOUT', label: 'Workout', icon: <DumbbellIcon /> },
-        { id: 'JOURNAL', label: 'Journal', icon: <BookOpenIcon /> },
-        { id: 'STATS', label: 'Stats', icon: <StatsIcon /> },
-        { id: 'WEEKLY_REVIEW', label: 'Review', icon: <ClipboardCheckIcon /> },
-        { id: 'SETTINGS', label: 'Settings', icon: <SettingsIcon /> },
+        { id: 'DASHBOARD', label: 'Dashboard', icon: <HomeIcon />, route: '/' },
+        { id: 'CALENDAR', label: 'Calendar', icon: <CalendarDaysIcon />, route: '/calendar' },
+        { id: 'TASKS', label: 'Tasks', icon: <TasksIcon />, route: '/tasks' },
+        { id: 'HABITS', label: 'Habits', icon: <RepeatIcon />, route: '/habits' },
+        { id: 'SHOPPING', label: 'Shopping', icon: <ShoppingCartIcon />, route: '/shopping' },
+        { id: 'WORKOUT', label: 'Workout', icon: <DumbbellIcon />, route: '/workouts' },
+        { id: 'JOURNAL', label: 'Journal', icon: <BookOpenIcon />, route: '/journal' },
+        { id: 'STATS', label: 'Stats', icon: <StatsIcon />, route: '/stats' },
+        { id: 'WEEKLY_REVIEW', label: 'Review', icon: <ClipboardCheckIcon />, route: '/weekly-review' },
+        { id: 'SETTINGS', label: 'Settings', icon: <SettingsIcon />, route: '/settings' },
     ];
 
     const handleNavigate = useCallback((moduleId: string) => {
@@ -71,7 +75,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeModule, setActiveMo
     }, [setActiveModule]);
 
     return (
-    <nav className="fixed bottom-0 left-0 right-0 h-20 bg-[var(--color-background-main)]/60 backdrop-blur-lg border-t border-white/10 z-50 shadow-2xl" role="navigation" aria-label="Main navigation">
+        <nav className="fixed bottom-0 left-0 right-0 h-20 bg-[var(--color-background-main)]/60 backdrop-blur-lg border-t border-white/10 z-50 shadow-2xl" role="navigation" aria-label="Main navigation">
             <div className="flex items-center justify-start sm:justify-center h-full px-4 overflow-x-auto overflow-y-hidden">
                 <div className="flex items-center gap-3">
                     {navItems.map(item => (
@@ -82,6 +86,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeModule, setActiveMo
                             moduleId={item.id}
                             isActive={activeModule === item.id}
                             onClick={handleNavigate}
+                            route={item.route}
                         />
                     ))}
                 </div>
