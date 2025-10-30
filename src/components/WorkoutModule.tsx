@@ -87,8 +87,28 @@ const EXERCISE_LIBRARY: Exercise[] = [
 const MUSCLE_GROUPS: Exercise['muscleGroup'][] = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Cardio'];
 
 // Used to seed the user's library if it's empty
-// Initial seed plans removed. Users will start with an empty workout library.
-const INITIAL_PLANS: Omit<WorkoutPlan, 'id'>[] = [];
+const INITIAL_PLANS: Omit<WorkoutPlan, 'id'>[] = [
+  {
+    name: 'Full Body Beginner',
+    exercises: [
+      { id: 'initial-1-1', name: 'Squat', muscleGroup: 'Legs', sets: 3, reps: 10, rest: 60 },
+      { id: 'initial-1-2', name: 'Push-ups', muscleGroup: 'Chest', sets: 3, reps: 10, note: 'Go for full range of motion.', rest: 60 },
+      { id: 'initial-1-3', name: 'Bent-Over Row', muscleGroup: 'Back', sets: 3, reps: 10, rest: 60 },
+      { id: 'initial-1-4', name: 'Overhead Press', muscleGroup: 'Shoulders', sets: 3, reps: 8, rest: 60 },
+      { id: 'initial-1-5', name: 'Plank', muscleGroup: 'Core', sets: 3, reps: 30, rest: 45 },
+    ],
+  },
+  {
+    name: 'Upper Body Push',
+    exercises: [
+      { id: 'initial-2-1', name: 'Bench Press', muscleGroup: 'Chest', sets: 4, reps: 8, weight: 60, rest: 90 },
+      { id: 'initial-2-2', name: 'Overhead Press', muscleGroup: 'Shoulders', sets: 3, reps: 10, weight: 40, rest: 60 },
+      { id: 'initial-2-3', name: 'Incline Dumbbell Press', muscleGroup: 'Chest', sets: 3, reps: 12, weight: 20, rest: 60 },
+      { id: 'initial-2-4', name: 'Lateral Raises', muscleGroup: 'Shoulders', sets: 3, reps: 15, weight: 10, note: 'Control the negative.', rest: 45 },
+      { id: 'initial-2-5', name: 'Tricep Dips', muscleGroup: 'Arms', sets: 3, reps: 12, rest: 60 },
+    ],
+  },
+];
 
 
 // --- MAIN COMPONENT ---
@@ -110,7 +130,12 @@ const WorkoutModule: React.FC<{ className?: string }> = ({ className = '' }) => 
   useEffect(() => {
     const storedPlans = localStorage.getItem('workoutPlans');
     if (!storedPlans) {
-        setWorkoutPlans([]);
+        const initialPlansWithIds = INITIAL_PLANS.map((plan, index) => ({
+            ...plan,
+            id: Date.now() + index,
+            exercises: plan.exercises.map(ex => ({...ex, id: `${Date.now() + index}-${ex.name}-${Math.random()}`})),
+        }));
+        setWorkoutPlans(initialPlansWithIds);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
