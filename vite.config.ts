@@ -8,7 +8,8 @@ export default defineConfig(({ mode }) => {
   // FIX: Cast `process` to `any` to resolve a TypeScript type definition conflict for `process.cwd()`.
   const env = loadEnv(mode, (process as any).cwd(), '')
   return {
-    plugins: [react(), visualizer({ filename: 'bundle-report.html', open: true })],
+      // plugins: [react(), visualizer({ filename: 'bundle-report.html', open: true })],
+      plugins: [react()],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
